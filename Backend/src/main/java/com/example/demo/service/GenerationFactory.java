@@ -32,31 +32,37 @@ public class GenerationFactory {
         // with using jackson
         ObjectMapper objectmapper = new ObjectMapper();
 
-        switch (jsonObject.get("nodeType").getAsString()){
-            case "Create":
+        if(jsonObject.has("nodeType")) {
+            switch (jsonObject.get("nodeType").getAsString()) {
+                case "Create":
 
-                Create create = objectmapper.readValue(jsonString, Create.class);
+                    Create create = objectmapper.readValue(jsonString, Create.class);
 
-                //GenerationLogic createLogic = create.generate();
+                    //GenerationLogic createLogic = create.generate();
 
-                return create;
+                    return create;
 
-            case "Update":
+                case "Update":
 
-                return objectmapper.readValue(jsonString, Update.class);
+                    return objectmapper.readValue(jsonString, Update.class);
 
-            case "Verify":
+                case "Verify":
 
-                return objectmapper.readValue(jsonString, Verify.class);
+                    return objectmapper.readValue(jsonString, Verify.class);
 
-            case "Delete":
+                case "Delete":
 
-                return objectmapper.readValue(jsonString, Delete.class);
+                    return objectmapper.readValue(jsonString, Delete.class);
 
-            default :
+                default:
 
-                throw new Exception("Unknown node type");
+                    System.out.println("Incorrect Node --------------------------------------------------------------- ");
+                    return null;
 
+            }
         }
+        else
+            System.out.println("No nodeType --------------------------------------------------------------- ");
+            return null;
     }
 }

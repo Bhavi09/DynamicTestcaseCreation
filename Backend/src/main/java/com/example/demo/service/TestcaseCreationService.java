@@ -1,5 +1,8 @@
 package com.example.demo.service;
 
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
+
 public interface TestcaseCreationService {
-    String testcaseInXML(String testcaseNodes) throws Exception;
+    ResponseEntity<Resource> testcaseInXML(String testcaseNodes) throws Exception;
 }

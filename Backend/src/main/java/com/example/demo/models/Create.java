@@ -4,24 +4,24 @@ import com.example.demo.service.GenerationLogic;
 
 public class Create implements GenerationLogic {
 
-    String dataJson;
+    String jsonData;
 
     String resourceType;
 
     public Create() {
     }
 
-    public Create(String dataJson, String resourceType) {
-        this.dataJson = dataJson;
+    public Create(String jsonData, String resourceType) {
+        this.jsonData = jsonData;
         this.resourceType = resourceType;
     }
 
-    public String getDataJson() {
-        return dataJson;
+    public String getjsonData() {
+        return jsonData;
     }
 
-    public void setDataJson(String dataJson) {
-        this.dataJson = dataJson;
+    public void setjsonData(String jsonData) {
+        this.jsonData = jsonData;
     }
 
     public String getresourceType() {
@@ -34,6 +34,9 @@ public class Create implements GenerationLogic {
 
     @Override
     public String generate() {
+
+
+
         return "creation Logic \n";
     }
 }
