@@ -1,9 +1,6 @@
 package com.example.demo.service;
 
-import com.example.demo.models.Create;
-import com.example.demo.models.Delete;
-import com.example.demo.models.Update;
-import com.example.demo.models.Verify;
+import com.example.demo.models.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -19,50 +16,39 @@ public class GenerationFactory {
     public List<GenerationLogic> getAllGenerationLogicInSequence(JsonArray jsonArray) throws Exception {
         List<GenerationLogic> list = new ArrayList();
         for(JsonElement j : jsonArray){
-            list.add(getClassOfGenerationLogic(j.getAsJsonObject()));
+            list.add(getClassOfGenerationLogic(j));
         }
         return list;
     }
-    GenerationLogic getClassOfGenerationLogic(JsonObject jsonObject) throws Exception {
+    GenerationLogic getClassOfGenerationLogic(JsonElement jsonElement) throws Exception {
 
-        JsonElement valuePart = jsonObject.get("value");
         Gson gson = new Gson();
-        String jsonString = gson.toJson(valuePart);
 
-        // with using jackson
+        String jsonString = gson.toJson(jsonElement);
+
+        JsonObject jsonObject = jsonElement.getAsJsonObject();
+
         ObjectMapper objectmapper = new ObjectMapper();
 
         if(jsonObject.has("nodeType")) {
-            switch (jsonObject.get("nodeType").getAsString()) {
-                case "Create":
-
-                    Create create = objectmapper.readValue(jsonString, Create.class);
-
-                    //GenerationLogic createLogic = create.generate();
-
-                    return create;
-
-                case "Update":
-
-                    return objectmapper.readValue(jsonString, Update.class);
-
-                case "Verify":
-
-                    return objectmapper.readValue(jsonString, Verify.class);
-
-                case "Delete":
-
-                    return objectmapper.readValue(jsonString, Delete.class);
-
-                default:
-
-                    System.out.println("Incorrect Node --------------------------------------------------------------- ");
-                    return null;
-
-            }
+            return switch (jsonObject.get("nodeType").getAsString()) {
+                case "Create" -> {
+                    yield objectmapper.readValue(jsonString, Create.class);
+                }
+                case "Verify" -> {
+                   yield objectmapper.readValue(jsonString, Verify.class);
+                }
+                case "Delete" -> {
+                   yield  objectmapper.readValue(jsonString, Delete.class);
+                }
+                case "Search" -> {
+                    yield objectmapper.readValue(jsonString, Search.class);
+                }
+                default -> {
+                    yield null;
+                }
+            };
         }
-        else
-            System.out.println("No nodeType --------------------------------------------------------------- ");
-            return null;
+        else return null;
     }
 }

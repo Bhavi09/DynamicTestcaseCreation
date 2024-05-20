@@ -4,35 +4,33 @@ import com.example.demo.service.GenerationLogic;
 
 public class Delete implements GenerationLogic {
 
-    String parameterName;
-
-    String parameterValue;
-
+    String nodeType;
     String resourceType;
+    String fhirResourceId;
 
     public Delete() {
     }
 
-    public Delete(String parameterValue, String parameterName, String resourceType) {
-        this.parameterValue = parameterValue;
-        this.parameterName = parameterName;
+    public Delete(String nodeType, String fhirResourceId, String resourceType) {
+        this.nodeType = nodeType;
+        this.fhirResourceId = fhirResourceId;
         this.resourceType = resourceType;
     }
 
-    public String getParameterName() {
-        return parameterName;
+    public String getNodeType() {
+        return nodeType;
     }
 
-    public void setParameterName(String parameterName) {
-        this.parameterName = parameterName;
+    public void setNodeType(String nodeType) {
+        this.nodeType = nodeType;
     }
 
-    public String getParameterValue() {
-        return parameterValue;
+    public String getFhirResourceId() {
+        return fhirResourceId;
     }
 
-    public void setParameterValue(String parameterValue) {
-        this.parameterValue = parameterValue;
+    public void setFhirResourceId(String fhirResourceId) {
+        this.fhirResourceId = fhirResourceId;
     }
 
     public String getResourceType() {
@@ -44,7 +42,17 @@ public class Delete implements GenerationLogic {
     }
 
     @Override
-    public String generate() {
-        return "Deletion Logic \n";
+    public String generate()
+    {
+        String xml = "         <send id=\""+nodeType+resourceType+"\" desc=\"delete "+resourceType+" from the FHIR server\" from=\"ITB\" to=\"FhirHandler\"\n" +
+                "                handler=\"$DOMAIN{fhirContextServiceAddress}\">\n" +
+                "            <input name=\"fhirServerBaseUrl\">$componentURI</input>\n" +
+                "            <input name=\"username\">$username</input>\n" +
+                "            <input name=\"password\">$password</input>\n" +
+                "            <input name=\"operationType\">\"delete\"</input>\n" +
+                "            <input name=\"fhirResourceType\">"+resourceType+"</input>\n" +
+                "            <input name=\"fhirResourceId\">$"+fhirResourceId+"</input>\n" +
+                "        </send>";
+        return xml;
     }
 }

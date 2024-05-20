@@ -1,0 +1,81 @@
+[
+  {
+    "componentName" : "Health Worker Registry",
+    "specificationName" : "HWWF1",
+    "testcaseName": "Verify system can do crud operations",
+    "description": "Testcase description",
+    "testCaseNumber": "1"
+
+  },
+  {
+    "bodies": [
+      {
+        "valueId": "PatientId",
+        "value": {
+          "resourceType": "Patient",
+          "identifier": [
+            {
+              "system": "http://fhir-server:8080/fhir/Patient/example-patient",
+              "value": "12345"
+            }
+          ],
+          "name": [
+            {
+              "use": "official",
+              "family": "Doe",
+              "given": ["John"]
+            }
+          ],
+          "gender": "male",
+          "birthDate": "1970-01-01"
+        }
+      },
+      {
+        "valueId": "PractitionerId",
+        "value": {
+          "resourceType": "Practitioner",
+          "identifier": [
+            {
+              "system": "urn:oid:1.2.3.4.5.6",
+              "value": "00010"
+            }
+          ],
+          "name": [
+            {
+              "given": ["Sam"]
+            }
+          ],
+          "telecom": [
+            {
+              "system": "phone",
+              "value": "888-888-8888",
+              "use": "mobile"
+            }
+          ],
+          "gender": "male",
+          "birthDate": "1962-12-12"
+        }
+      }
+    ]
+  },
+  {
+    "nodeType": "Create",
+    "resourceType": "Patient",
+    "valueId": "PatientId"
+  },
+  {
+    "nodeType": "Search",
+    "resourceType": "Patient"
+  },
+  {
+    "nodeType": "Verify",
+    "handler": "StringValidator",
+    "expectedData": "123",
+    "actualData" : ["patientCreated", "id"]
+  },
+  {
+    "nodeType": "Delete",
+    "resourceType": "Patient",
+    "fhirResourceId": "Patient123" 
+  }
+]
