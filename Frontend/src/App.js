@@ -8,12 +8,15 @@ import ReactFlow, {
   addEdge,
   removeElements,
 } from 'reactflow';
+import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
 import CreateNode from './nodes/createNode.js';
 import DeleteNode from './nodes/deleteNode.js';
 import Modal from 'react-modal';
 import './text-updater-node.css';
 import 'reactflow/dist/style.css';
 import './dropdown-menu.css';
+import { ButtonGroup, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 
 Modal.setAppElement('#root');
 
@@ -155,6 +158,10 @@ export default function App() {
     setSubmittedData(jsonData);
   };
 
+  const handleSelectChange = (event) => {
+    console.log("Selected Node:", event.target.value);
+  };
+
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
       <div ref={reactFlowWrapper} style={{ width: '75vw', height: '75vh' }}>
@@ -178,22 +185,24 @@ export default function App() {
         )}
       </div>
       <div style={{ marginLeft: 'auto', marginRight: 'auto', marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        <button style={{ padding: '10px 20px', fontSize: '16px' }} onClick={handleAddBody}>Add Body</button>
+        <Button variant="contained" style={{ padding: '10px 20px', fontSize: '16px' }} onClick={handleAddBody}>Add Body</Button>
+
         <div style={{ position: 'relative' }}>
-          <button
+        <FormControl variant="filled" style={{ minWidth: 200 }}>
+          <InputLabel>Select Node:</InputLabel>
+        <Select
+        id="demo-simple-select"
             style={{ padding: '10px 20px', fontSize: '16px' }}
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          label="Select Nodes"
+          onChange={(e)=>{AddNode(e.target.value)}}
           >
-            Add Node
-          </button>
-          {isDropdownOpen && (
-            <div className="dropdown-menu">
-              <button onClick={() => AddNode('Create')} style={{ display: 'block', margin: '5px 0' }}>Create</button>
-              <button onClick={() => AddNode('Delete')} style={{ display: 'block', margin: '5px 0' }}>Delete</button>
-            </div>
-          )}
+              <MenuItem value="Create"  style={{ display: 'block', margin: '5px 0' }}>Create</MenuItem>
+              <MenuItem value="Delete"  style={{ display: 'block', margin: '5px 0' }}>Delete</MenuItem>
+             
+              </Select>
+              </FormControl>
         </div>
-        <button style={{ padding: '10px 20px', fontSize: '16px' }} onClick={handleSubmit}>Submit</button>
+        <Button variant="contained" style={{ padding: '10px 20px', fontSize: '16px' }} onClick={handleSubmit}>Submit</Button>
       </div>
       <Modal
         isOpen={modalIsOpen}
