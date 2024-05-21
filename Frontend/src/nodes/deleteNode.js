@@ -8,7 +8,7 @@ const options = [
   { value: 'Document', label: 'Document' },
 ];
 
-function CreateNode({ data, isConnectable }) {
+function DeleteNode({ data, isConnectable }) {
   const [selectedOption, setSelectedOption] = useState(data.value['resourceType'] || options[0].value);
   const [textValue, setTextValue] = useState(data.value['text'] || '');
 
@@ -19,7 +19,7 @@ function CreateNode({ data, isConnectable }) {
 
   const handleTextChange = (event) => {
     setTextValue(event.target.value);
-    data.value['valueId'] = event.target.value;
+    data.value['fhirResourceId'] = event.target.value;
   };
 
   return (
@@ -36,7 +36,7 @@ function CreateNode({ data, isConnectable }) {
         </select>
       </div>
       <div>
-        <label htmlFor="text">ValueId: </label>
+        <label htmlFor="text">Fhir Resource Id: </label>
         <input id="text" value={textValue} onChange={handleTextChange} className="nodrag" />
       </div>
       <button onClick={data.onDelete} style={{ marginTop: '10px' }}>Delete Node</button>
@@ -45,4 +45,4 @@ function CreateNode({ data, isConnectable }) {
   );
 }
 
-export default CreateNode;
+export default DeleteNode;
