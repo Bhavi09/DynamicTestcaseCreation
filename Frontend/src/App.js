@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import ReactFlow, {
   MiniMap,
   Controls,
@@ -13,6 +13,7 @@ import DeleteNode from './nodes/deleteNode.js';
 import Modal from 'react-modal';
 import './text-updater-node.css';
 import 'reactflow/dist/style.css';
+import './dropdown-menu.css';
 
 Modal.setAppElement('#root');
 
@@ -28,6 +29,7 @@ export default function App() {
   const [bodyId, setBodyId] = useState('');
   const [bodyValue, setBodyValue] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const reactFlowWrapper = useRef(null);
 
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
@@ -69,14 +71,20 @@ export default function App() {
 
   const AddNode = (type) => {
     const newNodeId = String(nodes.length + 1);
-    const lastNode = nodes[nodes.length - 1];
+    const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+    const previousNode = nodes[nodes.length - 1];
+
+    const newPosition = previousNode
+      ? { x: previousNode.position.x, y: previousNode.position.y + 150 }
+      : {
+        x: reactFlowBounds.width / 2 - 75,
+        y: reactFlowBounds.height / 2 - 50,
+      };
+
     const newNode = {
       id: newNodeId,
       type:`${type}Node`,
-      position: {
-        x: lastNode ? lastNode.position.x : window.innerWidth / 2,
-        y: lastNode ? lastNode.position.y + 100 : window.innerHeight / 2
-      },
+      position: newPosition,
       data: {
         value: {
           nodeType: type
@@ -140,20 +148,16 @@ export default function App() {
 
   const handleSubmit = () => {
     const connectedNodes = topologicalSort(nodes, edges);
-    const nodeLabels = connectedNodes.map((node) => {
+    const jsonData = connectedNodes.map((node) => {
       return node.data.value;
     });
-
-    const jsonData = {
-      NodeData: nodeLabels,
-    };
 
     setSubmittedData(jsonData);
   };
 
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
-      <div style={{ width: '75vw', height: '75vh' }}>
+      <div ref={reactFlowWrapper} style={{ width: '75vw', height: '75vh' }}>
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -183,16 +187,7 @@ export default function App() {
             Add Node
           </button>
           {isDropdownOpen && (
-            <div style={{
-              position: 'absolute',
-              top: '40px',
-              left: '0',
-              backgroundColor: 'white',
-              border: '1px solid #ccc',
-              padding: '10px',
-              boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-              zIndex: 10
-            }}>
+            <div className="dropdown-menu">
               <button onClick={() => AddNode('Create')} style={{ display: 'block', margin: '5px 0' }}>Create</button>
               <button onClick={() => AddNode('Delete')} style={{ display: 'block', margin: '5px 0' }}>Delete</button>
             </div>

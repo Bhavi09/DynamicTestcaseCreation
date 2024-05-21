@@ -39,7 +39,7 @@ function CreateNode({ data, isConnectable }) {
         <label htmlFor="text">ValueId: </label>
         <input id="text" value={textValue} onChange={handleTextChange} className="nodrag" />
       </div>
-      <button onClick={data.onDelete} style={{ marginTop: '10px' }}>Delete Node</button>
+      <button onClick={data.onDelete} style={{ marginTop: '10px' }}>Delete</button>
       <Handle type="source" position={Position.Bottom} id='b' isConnectable={isConnectable} />
     </div>
   );
