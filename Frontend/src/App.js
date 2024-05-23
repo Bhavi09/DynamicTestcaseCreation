@@ -32,25 +32,23 @@ Modal.setAppElement('#root');
 const initialNodes = [];
 const initialEdges = [];
 let bodyValues = new Map([]);
-const testcaseDescription = {
-  componentName : '',
-  specificationName : "",
-    testcaseName: "",
-    description: "",
-    testCaseNumber: ""
-};
-const nodeTypes = { CreateNode: CreateNode, DeleteNode: DeleteNode, SearchNode:SearchNode, VerifyNode:VerifyNode };
 
+const testcaseDescription = {
+  componentName : "Client Registry",
+  specificationName : "CRF1",
+    testcaseName: "Check patient creation and deletion",
+    description: "Check patient creation and deletion",
+    testCaseNumber: "1"
+};
+
+const nodesName = ["Create","Delete","Verify","Search"];
+const nodeTypes = { CreateNode: CreateNode, DeleteNode: DeleteNode, SearchNode:SearchNode, VerifyNode:VerifyNode };
 export default function App() {
   const dispatch = useDispatch();
   const valueIds = useSelector(state => state.valueIds);
-
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [submittedData, setSubmittedData] = useState(null);
-  const [modalIsOpen, setIsOpen] = useState(false);
-  const [bodyId, setBodyId] = useState('');
-  const [bodyValue, setBodyValue] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const reactFlowWrapper = useRef(null);
   const [open, setOpen] = useState(false);
@@ -164,33 +162,27 @@ export default function App() {
   let listOfValueIds = useSelector(state => state.valueIds);
 
   const handleSubmit = () => {
-    const connectedNodes = topologicalSort(nodes, edges);
+    const connectedNodes = topologicalSort(nodes, edges).map((node)=>{
+      return node.data.value;
+    });
 
     const bodies = [];
 
     for (let i = 0; i < bodyValues.size; i++) {
       bodies.push({
         valueId: listOfValueIds[i],
-        value: bodyValues.get(listOfValueIds[i])
+        value:JSON.parse(bodyValues.get(listOfValueIds[i]).resource)
       });
     }
 
 
-
-
-    const body = {
+    const jsonBody = {
       testcaseDescription,
-      data: {
-        bodies: bodies
-      },
+      bodies: bodies,
       connectedNodes
     };
 
-    const jsonData = connectedNodes.map((node) => {
-      return node.data.value;
-    });
-
-    setSubmittedData(jsonData);
+    setSubmittedData(jsonBody);
   };
 
   const handleJsonChange = (event) => {
@@ -206,9 +198,7 @@ export default function App() {
       const formJson = Object.fromEntries(formData.entries());
       const resourceId = formJson.resourceId;
       bodyValues.set(resourceId, formJson);
-      dispatch(addValueId(resourceId));
-      console.log(formJson);
-      console.log(resourceId);
+      dispatch(addValueId(resourceId));;
       setJsonError(false);
       handleClose();
     } catch (error) {
@@ -271,10 +261,11 @@ export default function App() {
               label="Select Nodes"
               onChange={handleNodeSelect}
             >
-              <MenuItem value="Create" style={{ display: 'block', margin: '5px 0' }}>Create</MenuItem>
-              <MenuItem value="Delete" style={{ display: 'block', margin: '5px 0' }}>Delete</MenuItem>
-              <MenuItem value="Search" style={{ display: 'block', margin: '5px 0' }}>Search</MenuItem>
-              <MenuItem value="Verify" style={{ display: 'block', margin: '5px 0' }}>Verify</MenuItem>
+   {nodesName.map((element) => (
+      <MenuItem value={element} key={element} style={{ display: 'block', margin: '5px 0' }}>
+        {element}
+      </MenuItem>
+    ))}
             </Select>
           </FormControl>
         </div>
