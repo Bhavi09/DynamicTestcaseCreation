@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
 import { Handle, Position } from 'reactflow';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 
 const handleStyle = { left: 10 };
 const options = [
@@ -23,26 +28,38 @@ function DeleteNode({ data, isConnectable }) {
   };
 
   return (
-    <div className="text-updater-node">
+      <Card sx={{ padding: 2, display: 'flex', flexDirection: 'column',alignItems:'center', gap: 2 }}>    
       <Handle type="target" position={Position.Top} id='b' />
-      <div>
-        <label htmlFor="text">Resource Type:</label>
-        <select value={selectedOption} onChange={handleSelectChange} className="nodrag">
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div>
-        <label htmlFor="text">Fhir Resource Id: </label>
-        <input id="text" value={textValue} onChange={handleTextChange} className="nodrag" />
-      </div>
-      <button onClick={data.onDelete} style={{ marginTop: '10px' }}>Delete</button>
+      <Typography gutterBottom variant="h6" component="div">
+          Delete
+        </Typography>
+      <FormControl fullWidth>
+          <InputLabel>Resource Type</InputLabel>
+          <Select
+            value={selectedOption}
+            label="Resource Type"
+            onChange={handleSelectChange}
+            className="nodrag"
+          >
+            {options.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <TextField
+          id="textfilled-basic"
+          label="Fhir Resource Id"
+          value={textValue}
+          onChange={handleTextChange}
+          fullWidth
+        />
+      <Button variant="contained" onClick={data.onDelete} sx={{ marginTop: 2 }}>Delete</Button>
       <Handle type="source" position={Position.Bottom} id='b' isConnectable={isConnectable} />
-    </div>
+      </Card>
   );
 }
 
 export default DeleteNode;
+

@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ReactFlow, {
   MiniMap,
   Controls,
@@ -6,9 +6,8 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
   addEdge,
-  removeElements,
+ updateEdge
 } from 'reactflow';
-import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import CreateNode from './nodes/createNode.js';
 import DeleteNode from './nodes/deleteNode.js';
@@ -17,14 +16,35 @@ import './text-updater-node.css';
 import 'reactflow/dist/style.css';
 import './dropdown-menu.css';
 import { ButtonGroup, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import TextField from '@mui/material/TextField';
+import "./App.css";
+import SearchNode from './nodes/searchNode.js';
+import VerifyNode from './nodes/verifyNode.js';
+import { useDispatch, useSelector } from 'react-redux';
+import {addValueId} from "./store/reducers.js"
 
 Modal.setAppElement('#root');
 
 const initialNodes = [];
 const initialEdges = [];
-const nodeTypes = { CreateNode: CreateNode, DeleteNode: DeleteNode };
+let bodyValues = new Map([]);
+const testcaseDescription = {
+  componentName : '',
+  specificationName : "",
+    testcaseName: "",
+    description: "",
+    testCaseNumber: ""
+};
+const nodeTypes = { CreateNode: CreateNode, DeleteNode: DeleteNode, SearchNode:SearchNode, VerifyNode:VerifyNode };
 
 export default function App() {
+  const dispatch = useDispatch();
+  const valueIds = useSelector(state => state.valueIds);
+
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [submittedData, setSubmittedData] = useState(null);
@@ -33,45 +53,39 @@ export default function App() {
   const [bodyValue, setBodyValue] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const reactFlowWrapper = useRef(null);
-
+  const [open, setOpen] = useState(false);
+  const [jsonError, setJsonError] = useState(false);
+  const [jsonContent, setJsonContent] = useState('');
+  const [selectedNodeType, setSelectedNodeType] = useState('');
+  const edgeUpdateSuccessful = useRef(true);
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
     [setEdges],
   );
 
-  const handleAddBody = () => {
-    setIsOpen(true);
-  };
 
-  const closeModal = () => {
-    setIsOpen(false);
-  };
+  // Managed Edge
+  const onEdgeUpdateStart = useCallback(() => {
+    edgeUpdateSuccessful.current = false;
+  }, []);
 
-  const handleSave = () => {
-    const newNodeId = String(nodes.length + 1);
-    const lastNode = nodes[nodes.length - 1];
-    const newNode = {
-      id: newNodeId,
-      type: 'CreateNode',
-      position: {
-        x: lastNode ? lastNode.position.x : window.innerWidth / 2,
-        y: lastNode ? lastNode.position.y + 140 : window.innerHeight / 2
-      },
-      data: {
-        value: {
-          nodeType: "Create",
-          bodyId,
-          bodyValue
-        },
-        onDelete: () => handleDeleteNode(newNodeId)
-      }
-    };
-    setNodes((prevNodes) => [...prevNodes, newNode]);
-    setIsOpen(false);
-    setBodyId('');
-    setBodyValue('');
-  };
+  const onEdgeUpdate = useCallback((oldEdge, newConnection) => {
+    edgeUpdateSuccessful.current = true;
+    setEdges((els) => updateEdge(oldEdge, newConnection, els));
+  }, []);
 
+  const onEdgeUpdateEnd = useCallback((_, edge) => {
+    if (!edgeUpdateSuccessful.current) {
+      setEdges((eds) => eds.filter((e) => e.id !== edge.id));
+    }
+
+    edgeUpdateSuccessful.current = true;
+  }, []);
+
+
+
+
+// Manage Node
   const AddNode = (type) => {
     const newNodeId = String(nodes.length + 1);
     const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
@@ -86,7 +100,7 @@ export default function App() {
 
     const newNode = {
       id: newNodeId,
-      type:`${type}Node`,
+      type: `${type}Node`,
       position: newPosition,
       data: {
         value: {
@@ -97,10 +111,8 @@ export default function App() {
     };
     setNodes((prevNodes) => [...prevNodes, newNode]);
     setIsDropdownOpen(false);
+    setSelectedNodeType('');
   };
-
-
- 
 
   const handleDeleteNode = useCallback(
     (nodeId) => {
@@ -118,7 +130,7 @@ export default function App() {
       adjList.set(node.id, []);
       inDegree.set(node.id, 0);
     });
-    console.log(inDegree);
+
 
     edges.forEach((edge) => {
       adjList.get(edge.source).push(edge.target);
@@ -127,7 +139,7 @@ export default function App() {
 
     const queue = [];
     inDegree.forEach((value, key) => {
-      console.log({key,value});
+      console.log({key, value});
       if (value === 0) {
         queue.push(key);
       }
@@ -149,8 +161,31 @@ export default function App() {
     return sortedNodes.map((nodeId) => nodes.find((node) => node.id === nodeId));
   };
 
+  let listOfValueIds = useSelector(state => state.valueIds);
+
   const handleSubmit = () => {
     const connectedNodes = topologicalSort(nodes, edges);
+
+    const bodies = [];
+
+    for (let i = 0; i < bodyValues.size; i++) {
+      bodies.push({
+        valueId: listOfValueIds[i],
+        value: bodyValues.get(listOfValueIds[i])
+      });
+    }
+
+
+
+
+    const body = {
+      testcaseDescription,
+      data: {
+        bodies: bodies
+      },
+      connectedNodes
+    };
+
     const jsonData = connectedNodes.map((node) => {
       return node.data.value;
     });
@@ -158,18 +193,57 @@ export default function App() {
     setSubmittedData(jsonData);
   };
 
-  const handleSelectChange = (event) => {
-    console.log("Selected Node:", event.target.value);
+  const handleJsonChange = (event) => {
+    setJsonContent(event.target.value);
+  };
+
+  const handleBodySubmit = (event) => {
+    event.preventDefault();
+
+    try {
+      JSON.parse(jsonContent);
+      const formData = new FormData(event.currentTarget);
+      const formJson = Object.fromEntries(formData.entries());
+      const resourceId = formJson.resourceId;
+      bodyValues.set(resourceId, formJson);
+      dispatch(addValueId(resourceId));
+      console.log(formJson);
+      console.log(resourceId);
+      setJsonError(false);
+      handleClose();
+    } catch (error) {
+      setJsonError(true);
+    }
+  };
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setJsonError(false);
+  };
+
+  const handleNodeSelect = (event) => {
+    const selectedType = event.target.value;
+    setSelectedNodeType(selectedType);
+    AddNode(selectedType);
   };
 
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
-      <div ref={reactFlowWrapper} style={{ width: '75vw', height: '75vh' }}>
+      <div ref={reactFlowWrapper} style={{ width: '75vw', height: '100vh' }}>
         <ReactFlow
+          className='reactflow-wrapper'
           nodes={nodes}
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
+          snapToGrid
+          onEdgeUpdate={onEdgeUpdate}
+          onEdgeUpdateStart={onEdgeUpdateStart}
+          onEdgeUpdateEnd={onEdgeUpdateEnd}
           onConnect={onConnect}
           nodeTypes={nodeTypes}
         >
@@ -185,66 +259,66 @@ export default function App() {
         )}
       </div>
       <div style={{ marginLeft: 'auto', marginRight: 'auto', marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        <Button variant="contained" style={{ padding: '10px 20px', fontSize: '16px' }} onClick={handleAddBody}>Add Body</Button>
+        <Button variant="contained" style={{ padding: '10px 20px', fontSize: '16px' }} onClick={handleClickOpen}>Add Body</Button>
 
         <div style={{ position: 'relative' }}>
-        <FormControl variant="filled" style={{ minWidth: 200 }}>
-          <InputLabel>Select Node:</InputLabel>
-        <Select
-        id="demo-simple-select"
-            style={{ padding: '10px 20px', fontSize: '16px' }}
-          label="Select Nodes"
-          onChange={(e)=>{AddNode(e.target.value)}}
-          >
-              <MenuItem value="Create"  style={{ display: 'block', margin: '5px 0' }}>Create</MenuItem>
-              <MenuItem value="Delete"  style={{ display: 'block', margin: '5px 0' }}>Delete</MenuItem>
-             
-              </Select>
-              </FormControl>
+          <FormControl variant="filled" style={{ minWidth: 200 }}>
+            <InputLabel>Select Node</InputLabel>
+            <Select
+              id="demo-simple-select"
+              style={{ padding: '10px 20px', fontSize: '16px' }}
+              value={selectedNodeType}
+              label="Select Nodes"
+              onChange={handleNodeSelect}
+            >
+              <MenuItem value="Create" style={{ display: 'block', margin: '5px 0' }}>Create</MenuItem>
+              <MenuItem value="Delete" style={{ display: 'block', margin: '5px 0' }}>Delete</MenuItem>
+              <MenuItem value="Search" style={{ display: 'block', margin: '5px 0' }}>Search</MenuItem>
+              <MenuItem value="Verify" style={{ display: 'block', margin: '5px 0' }}>Verify</MenuItem>
+            </Select>
+          </FormControl>
         </div>
         <Button variant="contained" style={{ padding: '10px 20px', fontSize: '16px' }} onClick={handleSubmit}>Submit</Button>
       </div>
-      <Modal
-        isOpen={modalIsOpen}
-        onRequestClose={closeModal}
-        contentLabel="Add Body"
-        style={{
-          content: {
-            top: '50%',
-            left: '50%',
-            right: 'auto',
-            bottom: 'auto',
-            marginRight: '-50%',
-            transform: 'translate(-50%, -50%)',
-            width: '400px',
-            padding: '20px',
-          },
+
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        PaperProps={{
+          component: 'form',
+          onSubmit: handleBodySubmit,
         }}
       >
-        <h2>Add Body</h2>
-        <form>
-          <label>
-            Value Id:
-            <input
-              type="text"
-              value={bodyId}
-              onChange={(e) => setBodyId(e.target.value)}
-              style={{ width: '100%', marginBottom: '10px', padding: '5px' }}
-            />
-          </label>
-          <label>
-            Value:
-            <textarea
-              value={bodyValue}
-              onChange={(e) => setBodyValue(e.target.value)}
-              rows="10"
-              style={{ width: '100%', padding: '5px' }}
-            />
-          </label>
-        </form>
-        <button onClick={handleSave} style={{ marginTop: '10px', padding: '10px 20px', fontSize: '16px' }}>Save</button>
-        <button onClick={closeModal} style={{ marginTop: '10px', marginLeft: '10px', padding: '10px 20px', fontSize: '16px' }}>Close</button>
-      </Modal>
+        <DialogTitle>Add Resource</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="resourceId"
+            name="resourceId"
+            label="Resource Id"
+            fullWidth
+            variant="standard"
+          />
+          <TextField
+            margin="dense"
+            id="resource"
+            name="resource"
+            label="Resource"
+            fullWidth
+            variant="outlined"
+            multiline
+            rows={3}
+            onChange={handleJsonChange}
+            error={jsonError}
+            helperText={jsonError ? "Invalid JSON content" : ""}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button type="submit">Submit</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
