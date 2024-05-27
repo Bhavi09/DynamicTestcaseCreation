@@ -43,7 +43,7 @@ public class Create implements GenerationLogic {
     @Override
     public String generate() {
         String xml =
-                "\n<send id=\""+getresourceType()+"ToCreate\" desc=\"Convert "+getresourceType()+"ToCreate jsonString => anyContent\" from=\"ITB\" to=\"FhirHandler\" handler=\"$DOMAIN{jsonStringConverterServiceAddress}\">\n" +
+                "\n<send id=\""+getValueId()+"ToCreate\" desc=\"Convert "+getresourceType()+"ToCreate jsonString => anyContent\" from=\"ITB\" to=\"FhirHandler\" handler=\"$DOMAIN{jsonStringConverterServiceAddress}\">\n" +
                         "    <input name=\"fhirServerBaseUrl\">$componentURI</input>\n" +
                         "    <input name=\"username\">$username</input>\n" +
                         "    <input name=\"password\">$password</input>\n" +
@@ -52,12 +52,12 @@ public class Create implements GenerationLogic {
                         "    <input name=\"bodyType\">\"jsonString\"</input>\n" +
                         "</send>\n" +
 
-                "<send id=\"created\" desc=\"Create "+this.resourceType+"in FHIR server\" from=\"ITB\" to=\"FhirHandler\" handler=\"$DOMAIN{fhirContextServiceAddress}\">\n" +
+                "<send id=\"created"+getValueId()+"\" desc=\"Create "+this.resourceType+"in FHIR server\" from=\"ITB\" to=\"FhirHandler\" handler=\"$DOMAIN{fhirContextServiceAddress}\">\n" +
                 "    <input name=\"fhirServerBaseUrl\">$componentURI</input>\n" +
                 "    <input name=\"username\">$username</input>\n" +
                 "    <input name=\"password\">$password</input>\n" +
                 "    <input name=\"operationType\">" + this.resourceType + "</input>\n" +
-                "    <input name=\"body\">$"+getresourceType()+"ToCreate{convertedBody}</input>\n" +
+                "    <input name=\"body\">$"+getValueId()+"ToCreate{convertedBody}</input>\n" +
                 "</send>\n";
         return xml;
     }

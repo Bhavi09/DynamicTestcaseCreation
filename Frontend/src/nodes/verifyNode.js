@@ -8,7 +8,6 @@ const handleStyle = { left: 10 };
 const options = [
   { value: 'Patient', label: 'Patient' },
   { value: 'Practitioner', label: 'Practitioner' },
-  { value: 'Document', label: 'Document' },
 ];
 
 function VerifyNode({ data, isConnectable }) {

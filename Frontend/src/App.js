@@ -41,7 +41,8 @@ import Slide from "@mui/material/Slide";
 import CloseIcon from "@mui/icons-material/Close";
 import Draggable from "react-draggable";
 import Paper from "@mui/material/Paper";
-import { log } from "react-modal/lib/helpers/ariaAppHider.js";
+
+
 
 const initialNodes = [];
 const initialEdges = [];
@@ -93,10 +94,12 @@ export default function App() {
   const [open, setOpen] = useState(false);
   const [jsonError, setJsonError] = useState(false);
   const [jsonContent, setJsonContent] = useState("");
+  const [duplicateResourceIdError, setDuplicateResourceIdError] = useState(false);
   const [selectedNodeType, setSelectedNodeType] = useState("");
   const [editResourceDialogOpen, setEditResourceDialogOpen] = useState(false);
   const [editResourceId, setEditResourceId] = useState(null);
   const [editedResourceValue, setEditedResourceValue] = useState({});
+  const [editedResourceValueError,setEditedResourceValueError] = useState(false);
   const edgeUpdateSuccessful = useRef(true);
 
   const onConnect = useCallback(
@@ -225,21 +228,30 @@ export default function App() {
     setSubmittedData(jsonBody);
   };
 
-  const handleJsonChange = (event) => {
+  const handleResourceIdChange = (event) => {
+    if (valueIds.includes(event.target.value)) {
+      setDuplicateResourceIdError(true);
+    } else {
+      setDuplicateResourceIdError(false);
+    }
+  };
+  
+  const handleResourceJsonChange = (event) => {
     setJsonContent(event.target.value);
   };
 
   const handleBodySubmit = (event) => {
     event.preventDefault();
     try {
-      const parsedResource = JSON.parse(jsonContent);
+
+      JSON.parse(jsonContent);
       const formData = new FormData(event.currentTarget);
       const formJson = Object.fromEntries(formData.entries());
-      console.log(formJson);
       const resourceId = formJson.resourceId;
       dispatch(addValueId(resourceId));
       dispatch(setBodyValue({ resourceId, formJson }));
       setJsonError(false);
+      setDuplicateResourceIdError(false);
       handleClose();
     } catch (error) {
       setJsonError(true);
@@ -291,15 +303,17 @@ export default function App() {
 
   const handleSaveResource = () => {
     try {
+      JSON.parse(editedResourceValue);
       dispatch(
         updateBodyValue({
           resourceId: editResourceId,
           resource: editedResourceValue,
         })
       );
+      setEditedResourceValueError(false);
       setEditResourceId(null);
     } catch (error) {
-      alert("Invalid JSON format");
+      setEditedResourceValueError(true);
     }
   };
 
@@ -405,6 +419,9 @@ export default function App() {
             label="Resource Id"
             fullWidth
             variant="standard"
+            onChange={handleResourceIdChange}
+            error={duplicateResourceIdError}
+            helperText={duplicateResourceIdError ? "Resource Id already exists" : ""}
           />
           <TextField
             margin="dense"
@@ -415,14 +432,14 @@ export default function App() {
             variant="outlined"
             multiline
             rows={3}
-            onChange={handleJsonChange}
+            onChange={handleResourceJsonChange}
             error={jsonError}
             helperText={jsonError ? "Invalid JSON content" : ""}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit">Submit</Button>
+          <Button type="submit" disabled={jsonError || duplicateResourceIdError}>Submit</Button>
         </DialogActions>
       </Dialog>
 
@@ -464,6 +481,7 @@ export default function App() {
                   variant="outlined"
                   onClick={() => handleEditResource(resourceId)}
                 >
+                  <i class="bi bi-pencil-square" style={{color:"GrayText"}}></i>
                   Edit
                 </Button>
                 <Button
@@ -494,6 +512,8 @@ export default function App() {
                   label="Resource Value"
                   multiline
                   rows={Math.min(20)}
+                  error={editedResourceValueError}
+                  helperText={editedResourceValueError ? "Invalid Json format":""}
                   style={{ marginTop: "10px" }}
                 />
               )}

@@ -2,8 +2,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
+ 
   valueIds: [],
   bodyValues: {},
+  
 };
 
 const valueId = createSlice({
