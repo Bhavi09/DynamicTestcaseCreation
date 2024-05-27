@@ -14,13 +14,16 @@ const valueId = createSlice({
       state.valueIds.push(action.payload);
     },
     setBodyValue: (state, action) => {
+      console.log(state);
       const { resourceId, formJson } = action.payload;
       state.bodyValues[resourceId] = formJson;
     },
     updateBodyValue: (state, action) => {
-      const { resourceId, formJson } = action.payload;
+      console.log(action.payload);
+      const { resourceId, resource } = action.payload;
+      console.log(state.valueIds);
       if (state.bodyValues[resourceId]) {
-        state.bodyValues[resourceId] = formJson;
+        state.bodyValues[resourceId].resource = resource;
       }
     },
     deleteBodyValue: (state, action) => {

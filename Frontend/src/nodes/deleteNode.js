@@ -9,8 +9,7 @@ import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 const handleStyle = { left: 10 };
 const options = [
   { value: 'Patient', label: 'Patient' },
-  { value: 'Practitioner', label: 'Practitioner' },
-  { value: 'Document', label: 'Document' },
+  { value: 'Practitioner', label: 'Practitioner' }
 ];
 
 function DeleteNode({ data, isConnectable }) {
@@ -28,7 +27,7 @@ function DeleteNode({ data, isConnectable }) {
   };
 
   return (
-      <Card sx={{ padding: 2, display: 'flex', flexDirection: 'column',alignItems:'center', gap: 2 }}>    
+      <Card sx={{ padding: 2, display: 'flex', flexDirection: 'column',alignItems:'center', gap: 2,minWidth: 300, minHeight: 100 }}>    
       <Handle type="target" position={Position.Top} id='b' />
       <Typography gutterBottom variant="h6" component="div">
           Delete

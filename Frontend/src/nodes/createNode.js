@@ -2,25 +2,23 @@ import React, { useEffect, useState } from 'react';
 import { Handle, Position } from 'reactflow';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { useSelector } from 'react-redux';
 
 const options = [
   { value: 'Patient', label: 'Patient' },
-  { value: 'Practitioner', label: 'Practitioner' },
-  { value: 'Document', label: 'Document' },
+  { value: 'Practitioner', label: 'Practitioner' }
 ];
 
 function CreateNode({ data, isConnectable }) {
 
-  const valueIds = useSelector(state => state.valueIds);
+  const valueIds = useSelector(state => state.valueIdReducer.valueIds);
 
   const [selectedResource, setSelectedResource] = useState(data.value['resourceType'] || options[0].value);
   const [selectedValueId, setSelectedValueId] = useState(data.value['text'] || '');
 
-  const handleResourceChange = (event) => {
+  const handleResourceChange = (event) => {;
     setSelectedResource(event.target.value);
     data.value['resourceType'] = event.target.value;
   };
