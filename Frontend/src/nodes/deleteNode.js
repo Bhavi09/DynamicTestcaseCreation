@@ -13,18 +13,24 @@ const options = [
 ];
 
 function DeleteNode({ data, isConnectable }) {
-  const [selectedOption, setSelectedOption] = useState(data.value['resourceType'] || options[0].value);
-  const [textValue, setTextValue] = useState(data.value['text'] || '');
+  const [selectedOption, setSelectedOption] = useState("");
+  const [fhirResourceIdValue, setFhirResourceId] = useState("");
+  const [operationIdValue, setOperationIdValue] = useState("");
 
   const handleSelectChange = (event) => {
     setSelectedOption(event.target.value);
     data.value['resourceType'] = event.target.value;
   };
 
-  const handleTextChange = (event) => {
-    setTextValue(event.target.value);
+  const handlfhirResourceIdChange = (event) => {
+    setFhirResourceId(event.target.value);
     data.value['fhirResourceId'] = event.target.value;
   };
+
+  const handleOperationIdDataChange = (event) => {
+    setOperationIdValue(event.target.value);
+    data.value["operationId"] = event.target.value;
+  }
 
   return (
       <Card sx={{ padding: 2, display: 'flex', flexDirection: 'column',alignItems:'center', gap: 2,minWidth: 300, minHeight: 100 }}>    
@@ -50,10 +56,18 @@ function DeleteNode({ data, isConnectable }) {
         <TextField
           id="textfilled-basic"
           label="Fhir Resource Id"
-          value={textValue}
-          onChange={handleTextChange}
+          value={fhirResourceIdValue}
+          onChange={handlfhirResourceIdChange}
           fullWidth
         />
+        <TextField
+        fullWidth
+        id="standard-required"
+        label="Operation Id"
+        value={operationIdValue}
+        onChange={handleOperationIdDataChange}
+        variant="standard"
+      />
       <Button variant="contained" onClick={data.onDelete} sx={{ marginTop: 2 }}>Delete</Button>
       <Handle type="source" position={Position.Bottom} id='b' isConnectable={isConnectable} />
       </Card>

@@ -8,6 +8,7 @@ public class Create implements GenerationLogic {
     String valueId;
     String resourceType;
 
+
     public Create() {
     }
 
@@ -56,7 +57,7 @@ public class Create implements GenerationLogic {
                 "    <input name=\"fhirServerBaseUrl\">$componentURI</input>\n" +
                 "    <input name=\"username\">$username</input>\n" +
                 "    <input name=\"password\">$password</input>\n" +
-                "    <input name=\"operationType\">" + this.resourceType + "</input>\n" +
+                "    <input name=\"operationType\">create</input>\n" +
                 "    <input name=\"body\">$"+getValueId()+"ToCreate{convertedBody}</input>\n" +
                 "</send>\n";
         return xml;

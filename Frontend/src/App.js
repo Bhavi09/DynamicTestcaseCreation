@@ -42,7 +42,11 @@ import CloseIcon from "@mui/icons-material/Close";
 import Draggable from "react-draggable";
 import Paper from "@mui/material/Paper";
 
-
+import {
+  EditTwoTone,
+  DeleteTwoTone,
+  SaveTwoTone
+} from '@ant-design/icons';
 
 const initialNodes = [];
 const initialEdges = [];
@@ -94,12 +98,14 @@ export default function App() {
   const [open, setOpen] = useState(false);
   const [jsonError, setJsonError] = useState(false);
   const [jsonContent, setJsonContent] = useState("");
-  const [duplicateResourceIdError, setDuplicateResourceIdError] = useState(false);
+  const [duplicateResourceIdError, setDuplicateResourceIdError] =
+    useState(false);
   const [selectedNodeType, setSelectedNodeType] = useState("");
   const [editResourceDialogOpen, setEditResourceDialogOpen] = useState(false);
   const [editResourceId, setEditResourceId] = useState(null);
   const [editedResourceValue, setEditedResourceValue] = useState({});
-  const [editedResourceValueError,setEditedResourceValueError] = useState(false);
+  const [editedResourceValueError, setEditedResourceValueError] =
+    useState(false);
   const edgeUpdateSuccessful = useRef(true);
 
   const onConnect = useCallback(
@@ -235,7 +241,7 @@ export default function App() {
       setDuplicateResourceIdError(false);
     }
   };
-  
+
   const handleResourceJsonChange = (event) => {
     setJsonContent(event.target.value);
   };
@@ -243,7 +249,6 @@ export default function App() {
   const handleBodySubmit = (event) => {
     event.preventDefault();
     try {
-
       JSON.parse(jsonContent);
       const formData = new FormData(event.currentTarget);
       const formJson = Object.fromEntries(formData.entries());
@@ -316,6 +321,18 @@ export default function App() {
       setEditedResourceValueError(true);
     }
   };
+
+  const showAllOperationIds = () => {
+    const operationIdsArray = [];
+    topologicalSort(nodes, edges).forEach((node) => {
+      if (!!node.data.value.operationId) {
+        operationIdsArray.push(node.data.value.operationId);
+      }
+    });
+    return operationIdsArray;
+  };
+
+  App.showAllOperationIds = showAllOperationIds;
 
   return (
     <div style={{ display: "flex", height: "100vh" }}>
@@ -421,7 +438,9 @@ export default function App() {
             variant="standard"
             onChange={handleResourceIdChange}
             error={duplicateResourceIdError}
-            helperText={duplicateResourceIdError ? "Resource Id already exists" : ""}
+            helperText={
+              duplicateResourceIdError ? "Resource Id already exists" : ""
+            }
           />
           <TextField
             margin="dense"
@@ -439,7 +458,12 @@ export default function App() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit" disabled={jsonError || duplicateResourceIdError}>Submit</Button>
+          <Button
+            type="submit"
+            disabled={jsonError || duplicateResourceIdError}
+          >
+            Submit
+          </Button>
         </DialogActions>
       </Dialog>
 
@@ -475,47 +499,62 @@ export default function App() {
         <List>
           {Object.keys(bodyValuesFromStore).map((resourceId) => (
             <div key={resourceId}>
-              <div style={{ display: "flex", alignItems: "center" }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  margin: "10px 10px",
+                }}
+              >
                 <ListItemText secondary={resourceId} style={{ flex: 1 }} />
                 <Button
                   variant="outlined"
+                  style={{ margin: "10px" }}
                   onClick={() => handleEditResource(resourceId)}
                 >
-                  <i class="bi bi-pencil-square" style={{color:"GrayText"}}></i>
-                  Edit
+                  <EditTwoTone />
                 </Button>
                 <Button
                   variant="outlined"
-                  color="error"
+                  style={{ margin: "10px" }}
                   onClick={() => handleDeleteResource(resourceId)}
                 >
-                  Delete
+                <DeleteTwoTone />
                 </Button>
                 {editResourceId === resourceId && (
                   <Button
                     variant="outlined"
-                    color="inherit"
                     onClick={handleSaveResource}
-                    style={{ marginLeft: "10px" }}
+                    style={{ margin: "10px" }}
                   >
-                    Save
+                    <SaveTwoTone />
                   </Button>
                 )}
               </div>
               {editResourceId === resourceId && (
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  margin="dense"
-                  value={editedResourceValue}
-                  onChange={(e) => setEditedResourceValue(e.target.value)}
-                  label="Resource Value"
-                  multiline
-                  rows={Math.min(20)}
-                  error={editedResourceValueError}
-                  helperText={editedResourceValueError ? "Invalid Json format":""}
-                  style={{ marginTop: "10px" }}
-                />
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    margin: "10px 10px",
+                  }}
+                >
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    margin="dense"
+                    value={editedResourceValue}
+                    onChange={(e) => setEditedResourceValue(e.target.value)}
+                    label="Resource Value"
+                    multiline
+                    rows={Math.min(20)}
+                    error={editedResourceValueError}
+                    helperText={
+                      editedResourceValueError ? "Invalid Json format" : ""
+                    }
+                    style={{ marginTop: "10px" }}
+                  />
+                </div>
               )}
               <Divider />
             </div>

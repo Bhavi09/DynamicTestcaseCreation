@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { useSelector } from 'react-redux';
+import App from '../App';
 
 const options = [
   { value: 'Patient', label: 'Patient' },
@@ -28,7 +29,7 @@ function CreateNode({ data, isConnectable }) {
   const handleValueIdChange = (event) => {
     setSelectedValueId(event.target.value);
     data.value['valueId'] = event.target.value;
-    data.value['oeprationId'] = event.target.value;
+    data.value['operationId'] = event.target.value +"ToCreate";
   };
 
 
@@ -61,6 +62,7 @@ function CreateNode({ data, isConnectable }) {
       onChange={handleValueIdChange}
       className="nodrag"
     >
+      
       {valueIds.length === 0 ? (
             <MenuItem disabled>No record found</MenuItem>
           ) : (
