@@ -2,12 +2,12 @@ package com.example.demo.models;
 
 import com.example.demo.service.GenerationLogic;
 
-public class Search implements GenerationLogic {
+public class Read implements GenerationLogic {
+
     String nodeType;
     String resourceType;
-    String parameters;
+    String fhirResourceId;
     String operationId;
-
 
     public String getNodeType() {
         return nodeType;
@@ -17,20 +17,20 @@ public class Search implements GenerationLogic {
         this.nodeType = nodeType;
     }
 
-    public String getParameters() {
-        return parameters;
-    }
-
-    public void setParameters(String parameters) {
-        this.parameters = parameters;
-    }
-
     public String getResourceType() {
         return resourceType;
     }
 
     public void setResourceType(String resourceType) {
         this.resourceType = resourceType;
+    }
+
+    public String getFhirResourceId() {
+        return fhirResourceId;
+    }
+
+    public void setFhirResourceId(String fhirResourceId) {
+        this.fhirResourceId = fhirResourceId;
     }
 
     public String getOperationId() {
@@ -42,15 +42,15 @@ public class Search implements GenerationLogic {
     }
 
     @Override
-    public String generate()
-    {
-        String xml = "\n        <send id=\""+getOperationId()+"\" desc=\"Search for "+resourceType+" from FHIR server\" from=\"ITB\" to=\"FhirHandler\" handler=\"$DOMAIN{fhirContextServiceAddress}\">\n" +
+    public String generate() {
+        String xml = "\n         <send id=\""+operationId+"\" desc=\"Read "+resourceType+" from the FHIR server\" from=\"ITB\" to=\"FhirHandler\"\n" +
+                "                handler=\"$DOMAIN{fhirContextServiceAddress}\">\n" +
                 "            <input name=\"fhirServerBaseUrl\">$componentURI</input>\n" +
                 "            <input name=\"username\">$username</input>\n" +
                 "            <input name=\"password\">$password</input>\n" +
-                "            <input name=\"operationType\">\"search\"</input>\n" +
-                "            <input name=\"fhirResourceType\">\""+resourceType+"\"</input>\n" +
-                "            <input name=\"parameters\">"+parameters+"</input>\n" +
+                "            <input name=\"operationType\">\"getById\"</input>\n" +
+                "            <input name=\"fhirResourceType\">"+resourceType+"</input>\n" +
+                "            <input name=\"fhirResourceId\">'"+fhirResourceId+"'</input>\n" +
                 "        </send>\n";
         return xml;
     }

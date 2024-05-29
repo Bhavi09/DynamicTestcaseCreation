@@ -12,7 +12,7 @@ const options = [
   { value: 'Practitioner', label: 'Practitioner' }
 ];
 
-function DeleteNode({ data, isConnectable }) {
+function ReadNode({ data, isConnectable }) {
   const [selectedOption, setSelectedOption] = useState("");
   const [fhirResourceIdValue, setFhirResourceId] = useState("");
   const [operationIdValue, setOperationIdValue] = useState("");
@@ -37,7 +37,7 @@ function DeleteNode({ data, isConnectable }) {
       <Handle type="target" position={Position.Top} id='b' />
       <Box sx={{ width: '100%', backgroundColor: '#1976d2', padding: 1, display: 'flex', justifyContent: 'center' }}>
         <Typography gutterBottom variant="h6" component="div" sx={{ color: 'white' }}>
-          Delete
+          Read
         </Typography>
       </Box>
       <FormControl fullWidth>
@@ -76,5 +76,5 @@ function DeleteNode({ data, isConnectable }) {
   );
 }
 
-export default DeleteNode;
+export default ReadNode;
 

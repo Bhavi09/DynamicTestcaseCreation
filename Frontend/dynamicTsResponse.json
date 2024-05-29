@@ -61,21 +61,25 @@
   {
     "nodeType": "Create",
     "resourceType": "Patient",
-    "valueId": "PatientId"
-  },
-  {
-    "nodeType": "Search",
-    "resourceType": "Patient"
-  },
-  {
-    "nodeType": "Verify",
-    "handler": "StringValidator",
-    "expectedData": "123",
-    "actualData" : ["patientCreated", "id"]
+    "valueId": "Patient1",
+    "operationId": "Patient1ToCreate"
   },
   {
     "nodeType": "Delete",
     "resourceType": "Patient",
-    "fhirResourceId": "Patient123" 
+    "fhirResourceId": "Patien1",
+    "operationId": "deletedPatient"
+  },
+  {
+    "nodeType": "Verify",
+    "handler": "StringValidator",
+    "actualData": "$createdPatient1{response}{body}{name}",
+    "expectedData": "Jane Doe",
+    "operationId": "verifypractient"
+  },
+  {
+    "nodeType": "Output",
+    "successMessage": "Test case completed successfully.",
+    "failureMessage": "Test case failed. Please check the failed step's report for more information and the test log."
   }
 ]

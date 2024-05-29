@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { FormControl, InputLabel, MenuItem, Select,Box } from "@mui/material";
 import { useSelector } from "react-redux";
 import App from "../App";
 
@@ -61,9 +61,11 @@ function VerifyNode({ data, isConnectable }) {
       }}
     >
       <Handle type="target" position={Position.Top} id="b" />
-      <Typography gutterBottom variant="h6" component="div">
-        Verify
-      </Typography>
+      <Box sx={{ width: '100%', backgroundColor: '#1976d2', padding: 1, display: 'flex', justifyContent: 'center' }}>
+        <Typography gutterBottom variant="h6" component="div" sx={{ color: 'white' }}>
+          Verify
+        </Typography>
+      </Box>
       <FormControl fullWidth>
         <InputLabel>Validators</InputLabel>
         <Select

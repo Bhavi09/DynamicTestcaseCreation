@@ -7,6 +7,7 @@ public class Delete implements GenerationLogic {
     String nodeType;
     String resourceType;
     String fhirResourceId;
+    String operationId;
 
     public Delete() {
     }
@@ -41,18 +42,26 @@ public class Delete implements GenerationLogic {
         this.resourceType = resourceType;
     }
 
+    public String getOperationId() {
+        return operationId;
+    }
+
+    public void setOperationId(String operationId) {
+        this.operationId = operationId;
+    }
+
     @Override
     public String generate()
     {
-        String xml = "         <send id=\""+nodeType+resourceType+"\" desc=\"delete "+resourceType+" from the FHIR server\" from=\"ITB\" to=\"FhirHandler\"\n" +
+        String xml = "\n         <send id=\""+operationId+"\" desc=\"delete "+resourceType+" from the FHIR server\" from=\"ITB\" to=\"FhirHandler\"\n" +
                 "                handler=\"$DOMAIN{fhirContextServiceAddress}\">\n" +
                 "            <input name=\"fhirServerBaseUrl\">$componentURI</input>\n" +
                 "            <input name=\"username\">$username</input>\n" +
                 "            <input name=\"password\">$password</input>\n" +
                 "            <input name=\"operationType\">\"delete\"</input>\n" +
                 "            <input name=\"fhirResourceType\">"+resourceType+"</input>\n" +
-                "            <input name=\"fhirResourceId\">$"+fhirResourceId+"</input>\n" +
-                "        </send>";
+                "            <input name=\"fhirResourceId\">'"+fhirResourceId+"'</input>\n" +
+                "        </send>\n";
         return xml;
     }
 }

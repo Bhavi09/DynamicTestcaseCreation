@@ -107,13 +107,13 @@ public class TestcaseCreationServiceImpl implements TestcaseCreationService {
 
         xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
         "<testcase id=\""+ testcaseId +"\" xmlns=\"http://www.gitb.com/tdl/v1/\" xmlns:gitb=\"http://www.gitb.com/core/v1/\">" +
-        "\t<metadata>\n" +
+        "\n\t<metadata>\n" +
         "\t\t<gitb:name>" + testcaseName + "</gitb:name>\n" +
         "\t\t<gitb:type>CONFORMANCE</gitb:type>\n" +
         "\t\t<gitb:version>1.0</gitb:version>\n" +
         "\t\t<gitb:description>Test case to " + testcaseName + "</gitb:description>\n" +
-        "\t</metadata>" +
-        "\t<imports>\n"
+        "\t</metadata>\n" +
+        "\n\t<imports>\n"
         );
 
         // Importing saved resources
@@ -124,11 +124,11 @@ public class TestcaseCreationServiceImpl implements TestcaseCreationService {
 
         xml.append(
         "\t</imports>\n" +
-        "<actors>\n" +
+        "\t<actors>\n" +
         "\t\t<gitb:actor id=\"ITB\" name=\"ITB\" role=\"SUT\"/>\n" +
         "\t\t<gitb:actor id=\"FhirHandler\" name=\"FhirHandlers\" role=\"SIMULATED\"/>\n" +
         "\t</actors>" +
-        "\t<steps stopOnError=\"true\">"
+        "\n<steps stopOnError=\"true\">\n"
         );
 
         List<GenerationLogic> allGenerationLogic = generationFactory.getAllGenerationLogicInSequence(jsonArray);
@@ -139,8 +139,8 @@ public class TestcaseCreationServiceImpl implements TestcaseCreationService {
             }
         }
 
-        xml.append("\t</steps>\n" +
-                "</testcase>"
+        xml.append("\n</steps>\n" +
+                "\n</testcase>"
         );
 
         // Defining the file path within the resources directory

@@ -5,16 +5,11 @@ import com.example.demo.service.GenerationLogic;
 public class Create implements GenerationLogic {
 
     String nodeType;
-    String valueId;
     String resourceType;
-
+    String valueId;
+    String operationId;
 
     public Create() {
-    }
-
-    public Create(String valueId, String resourceType) {
-        this.valueId = valueId;
-        this.resourceType = resourceType;
     }
 
     public String getNodeType() {
@@ -41,6 +36,14 @@ public class Create implements GenerationLogic {
         this.resourceType = resourceType;
     }
 
+    public String getOperationId() {
+        return operationId;
+    }
+
+    public void setOperationId(String operationId) {
+        this.operationId = operationId;
+    }
+
     @Override
     public String generate() {
         String xml =
@@ -53,7 +56,7 @@ public class Create implements GenerationLogic {
                         "    <input name=\"bodyType\">\"jsonString\"</input>\n" +
                         "</send>\n" +
 
-                "<send id=\"created"+getValueId()+"\" desc=\"Create "+this.resourceType+"in FHIR server\" from=\"ITB\" to=\"FhirHandler\" handler=\"$DOMAIN{fhirContextServiceAddress}\">\n" +
+                "\n<send id=\""+getOperationId()+"\" desc=\"Create "+this.resourceType+"in FHIR server\" from=\"ITB\" to=\"FhirHandler\" handler=\"$DOMAIN{fhirContextServiceAddress}\">\n" +
                 "    <input name=\"fhirServerBaseUrl\">$componentURI</input>\n" +
                 "    <input name=\"username\">$username</input>\n" +
                 "    <input name=\"password\">$password</input>\n" +

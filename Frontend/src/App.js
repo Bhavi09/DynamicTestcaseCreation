@@ -2,15 +2,19 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
   MiniMap,
   Controls,
-  Background,
   useNodesState,
   useEdgesState,
   addEdge,
   updateEdge,
+  Background,
+  BackgroundVariant,
 } from "reactflow";
 import Button from "@mui/material/Button";
+import { notification } from "antd";
+import axios from "axios";
 import CreateNode from "./nodes/createNode.js";
 import DeleteNode from "./nodes/deleteNode.js";
+import OutputNode from "./nodes/outputNode.js";
 import "./text-updater-node.css";
 import "reactflow/dist/style.css";
 import "./dropdown-menu.css";
@@ -23,6 +27,7 @@ import TextField from "@mui/material/TextField";
 import "./App.css";
 import SearchNode from "./nodes/searchNode.js";
 import VerifyNode from "./nodes/verifyNode.js";
+import ReadNode from "./nodes/readNode.js";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addValueId,
@@ -42,11 +47,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import Draggable from "react-draggable";
 import Paper from "@mui/material/Paper";
 
-import {
-  EditTwoTone,
-  DeleteTwoTone,
-  SaveTwoTone
-} from '@ant-design/icons';
+import { EditTwoTone, DeleteTwoTone, SaveTwoTone } from "@ant-design/icons";
 
 const initialNodes = [];
 const initialEdges = [];
@@ -59,13 +60,15 @@ const testcaseDescription = {
   testCaseNumber: "1",
 };
 
-const nodesName = ["Create", "Delete", "Verify", "Search"];
+const nodesName = ["Create", "Read", "Delete", "Verify", "Search","Output"];
 
 const nodeTypes = {
   CreateNode: CreateNode,
   DeleteNode: DeleteNode,
   SearchNode: SearchNode,
   VerifyNode: VerifyNode,
+  ReadNode: ReadNode,
+  OutputNode:OutputNode
 };
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -108,19 +111,57 @@ export default function App() {
     useState(false);
   const edgeUpdateSuccessful = useRef(true);
 
+  // Managed Edge
+
+  const edgeArrowSize = 10;
+
+  const CustomEdge = (edgeProps) => (
+    <g className="react-flow__edge">
+      <path className="react-flow__edge-path" d={edgeProps.path} />
+      <marker
+        id="arrowhead"
+        markerWidth={edgeArrowSize}
+        markerHeight={edgeArrowSize}
+        refX={edgeArrowSize / 2}
+        refY={edgeArrowSize / 2}
+        orient="auto"
+        markerUnits="userSpaceOnUse"
+      >
+        <path
+          d={`M0,0 L${edgeArrowSize},${
+            edgeArrowSize / 2
+          } L0,${edgeArrowSize} L${edgeArrowSize / 2},${edgeArrowSize / 2} Z`}
+          fill="black"
+        />
+      </marker>
+    </g>
+  );
+
+  const edgeTypes = {
+    custom: CustomEdge,
+  };
+
   const onConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
+    (params) =>
+      setEdges((eds) =>
+        addEdge({ ...params, markerEnd: "url(#arrowhead)" }, eds)
+      ),
     [setEdges]
   );
 
-  // Managed Edge
   const onEdgeUpdateStart = useCallback(() => {
     edgeUpdateSuccessful.current = false;
   }, []);
 
   const onEdgeUpdate = useCallback((oldEdge, newConnection) => {
     edgeUpdateSuccessful.current = true;
-    setEdges((els) => updateEdge(oldEdge, newConnection, els));
+    setEdges((els) =>
+      updateEdge(
+        oldEdge,
+        { ...newConnection, markerEnd: "url(#arrowhead)" },
+        els
+      )
+    );
   }, []);
 
   const onEdgeUpdateEnd = useCallback((_, edge) => {
@@ -138,7 +179,7 @@ export default function App() {
     const previousNode = nodes[nodes.length - 1];
 
     const newPosition = previousNode
-      ? { x: previousNode.position.x, y: previousNode.position.y + 150 }
+      ? { x: previousNode.position.x, y: previousNode.position.y + 500 }
       : {
           x: reactFlowBounds.width / 2 - 75,
           y: reactFlowBounds.height / 2 - 50,
@@ -216,7 +257,6 @@ export default function App() {
       console.log(node.data);
       return node.data.value;
     });
-
     const bodies = [];
     for (let i = 0; i < listOfValueIds.length; i++) {
       bodies.push({
@@ -225,13 +265,31 @@ export default function App() {
       });
     }
 
-    const jsonBody = {
-      testcaseDescription,
-      bodies: bodies,
-      connectedNodes,
-    };
+    const jsonBody = [testcaseDescription, { bodies: bodies }];
+    connectedNodes.forEach((node) => {
+      jsonBody.push(node);
+    });
 
-    setSubmittedData(jsonBody);
+    // setSubmittedData(jsonBody);
+    postData(jsonBody);
+  };
+
+  const postData = async (jsonBody) => {
+    const url = "http://localhost:8080/generateTestcase";
+    const urlEncodedBody = encodeURIComponent(JSON.stringify(jsonBody));
+    const payload = `testcaseNodes=${urlEncodedBody}`;
+    try {
+      const response = await axios.post(url, payload, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      });
+      notification.success({
+        message: "Success",
+        description: "Zip file has been created successfully",
+        placement: "top",
+      });
+    } catch (error) {}
   };
 
   const handleResourceIdChange = (event) => {
@@ -244,6 +302,7 @@ export default function App() {
 
   const handleResourceJsonChange = (event) => {
     setJsonContent(event.target.value);
+    setJsonError(false);
   };
 
   const handleBodySubmit = (event) => {
@@ -258,6 +317,11 @@ export default function App() {
       setJsonError(false);
       setDuplicateResourceIdError(false);
       handleClose();
+      notification.success({
+        message: "Success",
+        description: "Resource has been created successfully",
+        placement: "top",
+      });
     } catch (error) {
       setJsonError(true);
     }
@@ -341,6 +405,7 @@ export default function App() {
           className="reactflow-wrapper"
           nodes={nodes}
           edges={edges}
+          edgeTypes={edgeTypes}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           snapToGrid
@@ -350,6 +415,7 @@ export default function App() {
           onConnect={onConnect}
           nodeTypes={nodeTypes}
         >
+          <Background color="#1976d2" variant={BackgroundVariant.Dots} />
           <Controls />
           <MiniMap />
           <Background variant="dots" gap={12} size={1} />
@@ -369,6 +435,7 @@ export default function App() {
           display: "flex",
           flexDirection: "column",
           gap: "10px",
+          position: "relative",
         }}
       >
         <Button
@@ -389,12 +456,12 @@ export default function App() {
 
         <div style={{ position: "relative" }}>
           <FormControl variant="filled" style={{ minWidth: 200 }}>
-            <InputLabel>Select Node</InputLabel>
+            <InputLabel>Select Operation</InputLabel>
             <Select
               id="demo-simple-select"
               style={{ padding: "10px 20px", fontSize: "16px" }}
               value={selectedNodeType}
-              label="Select Nodes"
+              label="Select Operation"
               onChange={handleNodeSelect}
             >
               {nodesName.map((element) => (
@@ -411,7 +478,14 @@ export default function App() {
         </div>
         <Button
           variant="contained"
-          style={{ padding: "10px 20px", fontSize: "16px" }}
+          style={{
+            position: "absolute",
+            padding: "10px 20px",
+            fontSize: "16px",
+            bottom: "40px",
+            left: "30px",
+            width: "150px",
+          }}
           onClick={handleSubmit}
         >
           Submit
@@ -485,7 +559,7 @@ export default function App() {
               <CloseIcon />
             </IconButton>
             <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-              Resource
+              Resources
             </Typography>
             <Button
               autoFocus
@@ -506,7 +580,13 @@ export default function App() {
                   margin: "10px 10px",
                 }}
               >
-                <ListItemText secondary={resourceId} style={{ flex: 1 }} />
+                <ListItemText
+                  secondary={resourceId}
+                  style={{ flex: 1 }}
+                  secondaryTypographyProps={{
+                    style: { fontSize: "0.95rem", color: "black" },
+                  }}
+                />
                 <Button
                   variant="outlined"
                   style={{ margin: "10px" }}
@@ -519,7 +599,7 @@ export default function App() {
                   style={{ margin: "10px" }}
                   onClick={() => handleDeleteResource(resourceId)}
                 >
-                <DeleteTwoTone />
+                  <DeleteTwoTone />
                 </Button>
                 {editResourceId === resourceId && (
                   <Button

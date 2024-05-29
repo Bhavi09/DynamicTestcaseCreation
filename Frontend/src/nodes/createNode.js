@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
-import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { FormControl, InputLabel, MenuItem, Select,Box } from '@mui/material';
 import { useSelector } from 'react-redux';
 import App from '../App';
 
@@ -23,22 +23,23 @@ function CreateNode({ data, isConnectable }) {
   const handleResourceChange = (event) => {;
     setSelectedResource(event.target.value);
     data.value['resourceType'] = event.target.value;
-    console.log(data)
   };
 
   const handleValueIdChange = (event) => {
     setSelectedValueId(event.target.value);
     data.value['valueId'] = event.target.value;
-    data.value['operationId'] = event.target.value +"ToCreate";
+    data.value['operationId'] = "created"+event.target.value;
   };
 
 
   return (
 <Card sx={{ padding: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, minWidth: 300, minHeight: 100 }}>
   <Handle type="target" position={Position.Top} id='b' />
-  <Typography gutterBottom variant="h6" component="div">
-    Create
-  </Typography>
+  <Box sx={{ width: '100%', backgroundColor: '#1976d2', padding: 1, display: 'flex', justifyContent: 'center' }}>
+        <Typography gutterBottom variant="h6" component="div" sx={{ color: 'white' }}>
+          Create
+        </Typography>
+      </Box>
   <FormControl fullWidth>
     <InputLabel>Resource Type</InputLabel>
     <Select
@@ -77,7 +78,7 @@ function CreateNode({ data, isConnectable }) {
   <TextField
         fullWidth
         id="standard-read-only-input"
-        value={`${selectedValueId}ToCreate`}
+        value={`created${selectedValueId}`}
         label="Operation Id"
         InputProps={{
           readOnly: true,

@@ -44,6 +44,12 @@ public class GenerationFactory {
                 case "Search" -> {
                     yield objectmapper.readValue(jsonString, Search.class);
                 }
+                case "Read" -> {
+                    yield objectmapper.readValue(jsonString, Read.class);
+                }
+                case "Output" -> {
+                    yield objectmapper.readValue(jsonString, Output.class);
+                }
                 default -> {
                     yield null;
                 }
