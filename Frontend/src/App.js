@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import ReactFlow, {
   MiniMap,
   Controls,
@@ -19,35 +19,20 @@ import "./text-updater-node.css";
 import "reactflow/dist/style.css";
 import "./dropdown-menu.css";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogTitle from "@mui/material/DialogTitle";
-import TextField from "@mui/material/TextField";
 import "./App.css";
 import SearchNode from "./nodes/searchNode.js";
 import VerifyNode from "./nodes/verifyNode.js";
 import ReadNode from "./nodes/readNode.js";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  addValueId,
-  setBodyValue,
-  updateBodyValue,
-  deleteBodyValue,
-} from "./store/reducers.js";
-import ListItemText from "@mui/material/ListItemText";
-import List from "@mui/material/List";
-import Divider from "@mui/material/Divider";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
 import Slide from "@mui/material/Slide";
-import CloseIcon from "@mui/icons-material/Close";
 import Draggable from "react-draggable";
 import Paper from "@mui/material/Paper";
+import { saveAs } from "file-saver";
+import AddResources from "./components/AddResources.js";
+import EditResources from "./components/editResources.js";
 
-import { EditTwoTone, DeleteTwoTone, SaveTwoTone } from "@ant-design/icons";
+
+
 
 const initialNodes = [];
 const initialEdges = [];
@@ -60,7 +45,7 @@ const testcaseDescription = {
   testCaseNumber: "1",
 };
 
-const nodesName = ["Create", "Read", "Delete", "Verify", "Search","Output"];
+const nodesName = ["Create", "Read", "Delete", "Verify", "Search", "Output"];
 
 const nodeTypes = {
   CreateNode: CreateNode,
@@ -68,7 +53,7 @@ const nodeTypes = {
   SearchNode: SearchNode,
   VerifyNode: VerifyNode,
   ReadNode: ReadNode,
-  OutputNode:OutputNode
+  OutputNode: OutputNode,
 };
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -87,8 +72,7 @@ const DraggablePaper = (props) => {
 };
 
 export default function App() {
-  const dispatch = useDispatch();
-  const valueIds = useSelector((state) => state.valueIdReducer.valueIds);
+  
   const bodyValuesFromStore = useSelector(
     (state) => state.valueIdReducer.bodyValues
   );
@@ -98,18 +82,10 @@ export default function App() {
   const [submittedData, setSubmittedData] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const reactFlowWrapper = useRef(null);
-  const [open, setOpen] = useState(false);
-  const [jsonError, setJsonError] = useState(false);
-  const [jsonContent, setJsonContent] = useState("");
-  const [duplicateResourceIdError, setDuplicateResourceIdError] =
-    useState(false);
   const [selectedNodeType, setSelectedNodeType] = useState("");
   const [editResourceDialogOpen, setEditResourceDialogOpen] = useState(false);
-  const [editResourceId, setEditResourceId] = useState(null);
-  const [editedResourceValue, setEditedResourceValue] = useState({});
-  const [editedResourceValueError, setEditedResourceValueError] =
-    useState(false);
   const edgeUpdateSuccessful = useRef(true);
+  const [openDialogBox, setOpenDialogBox] = useState(false);
 
   // Managed Edge
 
@@ -283,57 +259,22 @@ export default function App() {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
+        responseType: "blob",
       });
+      const blob = new Blob([response.data], { type: "application/zip" });
+      saveAs(blob, "testcase.zip");
       notification.success({
         message: "Success",
-        description: "Zip file has been created successfully",
-        placement: "top",
-      });
-    } catch (error) {}
-  };
-
-  const handleResourceIdChange = (event) => {
-    if (valueIds.includes(event.target.value)) {
-      setDuplicateResourceIdError(true);
-    } else {
-      setDuplicateResourceIdError(false);
-    }
-  };
-
-  const handleResourceJsonChange = (event) => {
-    setJsonContent(event.target.value);
-    setJsonError(false);
-  };
-
-  const handleBodySubmit = (event) => {
-    event.preventDefault();
-    try {
-      JSON.parse(jsonContent);
-      const formData = new FormData(event.currentTarget);
-      const formJson = Object.fromEntries(formData.entries());
-      const resourceId = formJson.resourceId;
-      dispatch(addValueId(resourceId));
-      dispatch(setBodyValue({ resourceId, formJson }));
-      setJsonError(false);
-      setDuplicateResourceIdError(false);
-      handleClose();
-      notification.success({
-        message: "Success",
-        description: "Resource has been created successfully",
+        description: "Zip file has been created and downloaded successfully",
         placement: "top",
       });
     } catch (error) {
-      setJsonError(true);
+      notification.error({
+        message: "Error",
+        description: "Failed to create the zip file",
+        placement: "top",
+      });
     }
-  };
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setJsonError(false);
   };
 
   const handleNodeSelect = (event) => {
@@ -346,45 +287,6 @@ export default function App() {
     setEditResourceDialogOpen(true);
   };
 
-  const handleEditResourceDialogClose = () => setEditResourceDialogOpen(false);
-
-  const handleResourceChange = (event, resourceId) => {
-    const { name, value } = event.target;
-    dispatch(
-      updateBodyValue({
-        resourceId,
-        formJson: {
-          ...bodyValuesFromStore[resourceId],
-          [name]: value,
-        },
-      })
-    );
-  };
-
-  const handleEditResource = (resourceId) => {
-    setEditResourceId(resourceId);
-    setEditedResourceValue(bodyValuesFromStore[resourceId]["resource"]);
-  };
-
-  const handleDeleteResource = (resourceId) => {
-    dispatch(deleteBodyValue(resourceId));
-  };
-
-  const handleSaveResource = () => {
-    try {
-      JSON.parse(editedResourceValue);
-      dispatch(
-        updateBodyValue({
-          resourceId: editResourceId,
-          resource: editedResourceValue,
-        })
-      );
-      setEditedResourceValueError(false);
-      setEditResourceId(null);
-    } catch (error) {
-      setEditedResourceValueError(true);
-    }
-  };
 
   const showAllOperationIds = () => {
     const operationIdsArray = [];
@@ -441,7 +343,9 @@ export default function App() {
         <Button
           variant="contained"
           style={{ padding: "10px 20px", fontSize: "16px" }}
-          onClick={handleClickOpen}
+          onClick={() => {
+            setOpenDialogBox(true);
+          }}
         >
           Add Resource
         </Button>
@@ -492,155 +396,14 @@ export default function App() {
         </Button>
       </div>
 
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        PaperProps={{
-          component: "form",
-          onSubmit: handleBodySubmit,
-        }}
-      >
-        <DialogTitle>Add Resource</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="resourceId"
-            name="resourceId"
-            label="Resource Id"
-            fullWidth
-            variant="standard"
-            onChange={handleResourceIdChange}
-            error={duplicateResourceIdError}
-            helperText={
-              duplicateResourceIdError ? "Resource Id already exists" : ""
-            }
-          />
-          <TextField
-            margin="dense"
-            id="resource"
-            name="resource"
-            label="Resource"
-            fullWidth
-            variant="outlined"
-            multiline
-            rows={3}
-            onChange={handleResourceJsonChange}
-            error={jsonError}
-            helperText={jsonError ? "Invalid JSON content" : ""}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button
-            type="submit"
-            disabled={jsonError || duplicateResourceIdError}
-          >
-            Submit
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog
-        fullScreen
-        open={editResourceDialogOpen}
-        onClose={handleEditResourceDialogClose}
-        PaperComponent={DraggablePaper}
-        TransitionComponent={Transition}
-      >
-        <AppBar sx={{ position: "relative" }}>
-          <Toolbar>
-            <IconButton
-              edge="start"
-              color="inherit"
-              onClick={handleEditResourceDialogClose}
-              aria-label="close"
-            >
-              <CloseIcon />
-            </IconButton>
-            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-              Resources
-            </Typography>
-            <Button
-              autoFocus
-              color="inherit"
-              onClick={handleEditResourceDialogClose}
-            >
-              Done
-            </Button>
-          </Toolbar>
-        </AppBar>
-        <List>
-          {Object.keys(bodyValuesFromStore).map((resourceId) => (
-            <div key={resourceId}>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  margin: "10px 10px",
-                }}
-              >
-                <ListItemText
-                  secondary={resourceId}
-                  style={{ flex: 1 }}
-                  secondaryTypographyProps={{
-                    style: { fontSize: "0.95rem", color: "black" },
-                  }}
-                />
-                <Button
-                  variant="outlined"
-                  style={{ margin: "10px" }}
-                  onClick={() => handleEditResource(resourceId)}
-                >
-                  <EditTwoTone />
-                </Button>
-                <Button
-                  variant="outlined"
-                  style={{ margin: "10px" }}
-                  onClick={() => handleDeleteResource(resourceId)}
-                >
-                  <DeleteTwoTone />
-                </Button>
-                {editResourceId === resourceId && (
-                  <Button
-                    variant="outlined"
-                    onClick={handleSaveResource}
-                    style={{ margin: "10px" }}
-                  >
-                    <SaveTwoTone />
-                  </Button>
-                )}
-              </div>
-              {editResourceId === resourceId && (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    margin: "10px 10px",
-                  }}
-                >
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    margin="dense"
-                    value={editedResourceValue}
-                    onChange={(e) => setEditedResourceValue(e.target.value)}
-                    label="Resource Value"
-                    multiline
-                    rows={Math.min(20)}
-                    error={editedResourceValueError}
-                    helperText={
-                      editedResourceValueError ? "Invalid Json format" : ""
-                    }
-                    style={{ marginTop: "10px" }}
-                  />
-                </div>
-              )}
-              <Divider />
-            </div>
-          ))}
-        </List>
-      </Dialog>
+      <AddResources
+        openDialogBox={openDialogBox}
+        setOpenDialogBox={setOpenDialogBox}
+      />
+      <EditResources
+        editResourceDialogOpen={editResourceDialogOpen}
+        setEditResourceDialogOpen={setEditResourceDialogOpen}
+      />
     </div>
   );
 }
