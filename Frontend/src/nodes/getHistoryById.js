@@ -6,7 +6,6 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { FormControl, InputLabel, MenuItem, Select,Box } from '@mui/material';
 
-
 const options = [
   {value: 'Patient', label: 'Patient' },
   {value: 'Practitioner', label: 'Practitioner' },
@@ -18,7 +17,7 @@ const options = [
   {value: 'ConceptMap', label: 'ConceptMap'}
 ];
 
-function DeleteNode({ data, isConnectable }) {
+function GetHistoryByIdNode({ data, isConnectable }) {
   const [selectedOption, setSelectedOption] = useState("");
   const [fhirResourceIdValue, setFhirResourceId] = useState("");
   const [operationIdValue, setOperationIdValue] = useState("");
@@ -43,7 +42,7 @@ function DeleteNode({ data, isConnectable }) {
       <Handle type="target" position={Position.Top} id='b' />
       <Box sx={{ width: '100%', backgroundColor: '#1976d2', padding: 1, display: 'flex', justifyContent: 'center' }}>
         <Typography gutterBottom variant="h6" component="div" sx={{ color: 'white' }}>
-          Delete
+          GetById
         </Typography>
       </Box>
       <FormControl fullWidth>
@@ -82,5 +81,5 @@ function DeleteNode({ data, isConnectable }) {
   );
 }
 
-export default DeleteNode;
+export default GetHistoryByIdNode;
 

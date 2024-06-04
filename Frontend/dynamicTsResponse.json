@@ -75,7 +75,36 @@
     "handler": "StringValidator",
     "actualData": "$createdPatient1{response}{body}{name}",
     "expectedData": "Jane Doe",
-    "operationId": "verifypractient"
+    "operationId": "verifyPatient"
+  },
+  {
+    "nodeType": "Lookup",
+    "resourceType" : "CodeSystem",
+    "system" : "",
+    "code" : "chol-mmol",
+    "operationId" : "lookup"  
+  },
+  {
+    "nodeType": "Loop",
+    "index": "counter",
+    "start": "0",
+    "end": "$searchedPatient{response}{body}{link}{size}",
+    "nodeJson": [
+      {
+        "nodeType": "Create",
+        "resourceType": "Patient",
+        "valueId": "PatientId"
+      },
+      {
+        "nodeType": "Search",
+        "resourceType": "Patient"
+      },
+      {
+        "nodeType": "Delete",
+        "resourceType": "Patient",
+        "fhirResourceId": "Patient123"
+      }
+    ]
   },
   {
     "nodeType": "Output",

@@ -6,16 +6,18 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { FormControl, InputLabel, MenuItem, Select,Box } from '@mui/material';
 
-const handleStyle = { left: 10 };
 const options = [
   {value: 'Patient', label: 'Patient' },
   {value: 'Practitioner', label: 'Practitioner' },
   {value: 'Observation', label:'Observation'},
   {value: 'DiagnosticReport', label: 'DiagnosticReport'},
-  {value: 'Encounter', label: 'Encounter'}
+  {value: 'Encounter', label: 'Encounter'},
+  {value: 'CodeSystem', label: 'CodeSystem'},
+  {value: 'ValueSet', label: 'ValueSet'},
+  {value: 'ConceptMap', label: 'ConceptMap'}
 ];
 
-function ReadNode({ data, isConnectable }) {
+function GetByIdNode({ data, isConnectable }) {
   const [selectedOption, setSelectedOption] = useState("");
   const [fhirResourceIdValue, setFhirResourceId] = useState("");
   const [operationIdValue, setOperationIdValue] = useState("");
@@ -40,7 +42,7 @@ function ReadNode({ data, isConnectable }) {
       <Handle type="target" position={Position.Top} id='b' />
       <Box sx={{ width: '100%', backgroundColor: '#1976d2', padding: 1, display: 'flex', justifyContent: 'center' }}>
         <Typography gutterBottom variant="h6" component="div" sx={{ color: 'white' }}>
-          Read
+          GetById
         </Typography>
       </Box>
       <FormControl fullWidth>
@@ -79,5 +81,5 @@ function ReadNode({ data, isConnectable }) {
   );
 }
 
-export default ReadNode;
+export default GetByIdNode;
 

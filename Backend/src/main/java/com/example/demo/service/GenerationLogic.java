@@ -2,6 +2,6 @@ package com.example.demo.service;
 
 public interface GenerationLogic {
 
-    String generate();
+    String generate() throws Exception;
 
 }

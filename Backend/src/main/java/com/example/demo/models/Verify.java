@@ -3,6 +3,8 @@ package com.example.demo.models;
 import com.example.demo.service.GenerationLogic;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Verify implements GenerationLogic {
 
@@ -70,8 +72,8 @@ public class Verify implements GenerationLogic {
 
         xmlBuilder.append("\n<verify id=\"").append(getOperationId()).append("\" handler=\"").append(handler)
                 .append("\" desc=\"Check if ").append(getOperationId()).append(" has value ").append(expectedData).append("\">\n")
-                .append("    <input name=\"actualstring\">$")
-                .append(getActualData());
+                .append("    <input name=\"actualstring\">")
+                .append(addQuotesToExpression(getActualData()));
 //                .append(actualData.get(0)).append("{response}{body}");
 
 //        for (int i = 1; i < actualData.size(); i++) {
@@ -82,7 +84,7 @@ public class Verify implements GenerationLogic {
         if ("StringValidator".equals(handler)) {
             // If the handler is StringValidator, add double quotes around expectedData
             xmlBuilder.append("</input>\n")
-                    .append("    <input name=\"expectedstring\">\'").append(expectedData).append("\'</input>\n")
+                    .append("    <input name=\"expectedstring\">").append(addQuotesToExpression(expectedData)).append("</input>\n")
                     .append("</verify>\n");
         } else {
             // For other handlers, just append the expectedData without quotes
@@ -94,4 +96,34 @@ public class Verify implements GenerationLogic {
         String xml = xmlBuilder.toString();
         return xml;
     }
+
+    private String addQuotesToExpression(String expression) {
+        // Regular expression to match static parts and leave dynamic parts intact
+        String regex = "(\\w+[=:][^\\|\\|]*)|([\\|\\|\\s]+)|(\\$[^\\s\\|\\|]+\\{[^}]+\\})";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(expression);
+
+        StringBuilder result = new StringBuilder();
+        boolean found = false;
+
+        while (matcher.find()) {
+            found = true;
+            String staticPart = matcher.group(1) != null ? matcher.group(1) : "";
+            String separator = matcher.group(2) != null ? matcher.group(2) : "";
+            String dynamicPart = matcher.group(3) != null ? matcher.group(3) : "";
+
+            if (!staticPart.isEmpty()) {
+                result.append("\"").append(staticPart).append("\"");
+            }
+            result.append(separator).append(dynamicPart);
+        }
+
+        // If no matches were found, return the original expression with quotes around it
+        if (!found) {
+            return "\"" + expression + "\"";
+        }
+
+        return result.toString();
+    }
+
 }

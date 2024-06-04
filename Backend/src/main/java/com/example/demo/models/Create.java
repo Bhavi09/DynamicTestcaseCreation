@@ -28,11 +28,11 @@ public class Create implements GenerationLogic {
         this.valueId = valueId;
     }
 
-    public String getresourceType() {
+    public String getResourceType() {
         return resourceType;
     }
 
-    public void setresourceType(String resourceType) {
+    public void setResourceType(String resourceType) {
         this.resourceType = resourceType;
     }
 
@@ -47,16 +47,16 @@ public class Create implements GenerationLogic {
     @Override
     public String generate() {
         String xml =
-                "\n<send id=\""+getValueId()+"ToCreate\" desc=\"Convert "+getresourceType()+"ToCreate jsonString => anyContent\" from=\"ITB\" to=\"FhirHandler\" handler=\"$DOMAIN{jsonStringConverterServiceAddress}\">\n" +
+                "\n<send id=\""+getValueId()+"ToCreate\" desc=\"Convert "+getResourceType()+"ToCreate jsonString => anyContent\" from=\"ITB\" to=\"FhirHandler\" handler=\"$DOMAIN{jsonStringConverterServiceAddress}\">\n" +
                         "    <input name=\"fhirServerBaseUrl\">$componentURI</input>\n" +
                         "    <input name=\"username\">$username</input>\n" +
                         "    <input name=\"password\">$password</input>\n" +
                         "    <input name=\"operationType\">\"create\"</input>\n" +
-                        "    <input name=\"body\">$"+valueId+"ToCreateInJsonString</input>\n" +
+                        "    <input name=\"body\">$"+getValueId()+"ToCreateInJsonString</input>\n" +
                         "    <input name=\"bodyType\">\"jsonString\"</input>\n" +
                         "</send>\n" +
 
-                "\n<send id=\""+getOperationId()+"\" desc=\"Create "+this.resourceType+"in FHIR server\" from=\"ITB\" to=\"FhirHandler\" handler=\"$DOMAIN{fhirContextServiceAddress}\">\n" +
+                "\n<send id=\""+getOperationId()+"\" desc=\"Create "+getResourceType()+"in FHIR server\" from=\"ITB\" to=\"FhirHandler\" handler=\"$DOMAIN{fhirContextServiceAddress}\">\n" +
                 "    <input name=\"fhirServerBaseUrl\">$componentURI</input>\n" +
                 "    <input name=\"username\">$username</input>\n" +
                 "    <input name=\"password\">$password</input>\n" +
@@ -66,12 +66,4 @@ public class Create implements GenerationLogic {
         return xml;
     }
 
-    @Override
-    public String toString() {
-        return "Create{" +
-                "nodeType='" + nodeType + '\'' +
-                ", valueId='" + valueId + '\'' +
-                ", resourceType='" + resourceType + '\'' +
-                '}';
-    }
 }

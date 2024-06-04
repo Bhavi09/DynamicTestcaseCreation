@@ -31,6 +31,7 @@ public class GenerationFactory {
         ObjectMapper objectmapper = new ObjectMapper();
 
         if(jsonObject.has("nodeType")) {
+
             return switch (jsonObject.get("nodeType").getAsString()) {
                 case "Create" -> {
                     yield objectmapper.readValue(jsonString, Create.class);
@@ -44,11 +45,29 @@ public class GenerationFactory {
                 case "Search" -> {
                     yield objectmapper.readValue(jsonString, Search.class);
                 }
-                case "Read" -> {
-                    yield objectmapper.readValue(jsonString, Read.class);
+                case "GetById" -> {
+                    yield objectmapper.readValue(jsonString, GetById.class);
                 }
                 case "Output" -> {
                     yield objectmapper.readValue(jsonString, Output.class);
+                }
+                case "GetHistoryById" -> {
+                    yield objectmapper.readValue(jsonString,GetHistoryById.class);
+                }
+                case "Lookup" -> {
+                    yield objectmapper.readValue(jsonString, Lookup.class);
+                }
+                case "Translate" -> {
+                    yield objectmapper.readValue(jsonString, Translate.class);
+                }
+                case "ValidateCode" -> {
+                    yield objectmapper.readValue(jsonString, ValidateCode.class);
+                }
+                case "Expand" -> {
+                    yield objectmapper.readValue(jsonString, Expand.class);
+                }
+                case "Loop" -> {
+                    yield objectmapper.readValue(jsonString, Loop.class);
                 }
                 default -> {
                     yield null;

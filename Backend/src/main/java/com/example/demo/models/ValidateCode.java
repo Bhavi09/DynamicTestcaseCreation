@@ -5,21 +5,14 @@ import com.example.demo.service.GenerationLogic;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Delete implements GenerationLogic {
+public class ValidateCode implements GenerationLogic {
 
     String nodeType;
     String resourceType;
-    String fhirResourceId;
+    String url;
+    String code;
+    String system;
     String operationId;
-
-    public Delete() {
-    }
-
-    public Delete(String nodeType, String fhirResourceId, String resourceType) {
-        this.nodeType = nodeType;
-        this.fhirResourceId = fhirResourceId;
-        this.resourceType = resourceType;
-    }
 
     public String getNodeType() {
         return nodeType;
@@ -29,20 +22,36 @@ public class Delete implements GenerationLogic {
         this.nodeType = nodeType;
     }
 
-    public String getFhirResourceId() {
-        return fhirResourceId;
-    }
-
-    public void setFhirResourceId(String fhirResourceId) {
-        this.fhirResourceId = fhirResourceId;
-    }
-
     public String getResourceType() {
         return resourceType;
     }
 
     public void setResourceType(String resourceType) {
         this.resourceType = resourceType;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getSystem() {
+        return system;
+    }
+
+    public void setSystem(String system) {
+        this.system = system;
     }
 
     public String getOperationId() {
@@ -54,16 +63,16 @@ public class Delete implements GenerationLogic {
     }
 
     @Override
-    public String generate()
-    {
-        String xml = "\n         <send id=\""+getOperationId()+"\" desc=\"delete "+getResourceType()+" from the FHIR server\" from=\"ITB\" to=\"FhirHandler\"\n" +
-                "                handler=\"$DOMAIN{fhirContextServiceAddress}\">\n" +
+    public String generate() {
+        String xml = "\n        <send id=\""+getOperationId()+"\" desc=\"Perform validate-code operation on valueSet\" from=\"ITB\" to=\"FhirHandler\" handler=\"$DOMAIN{fhirContextServiceAddress}\">\n" +
                 "            <input name=\"fhirServerBaseUrl\">$componentURI</input>\n" +
                 "            <input name=\"username\">$username</input>\n" +
                 "            <input name=\"password\">$password</input>\n" +
-                "            <input name=\"operationType\">\"delete\"</input>\n" +
                 "            <input name=\"fhirResourceType\">"+getResourceType()+"</input>\n" +
-                "            <input name=\"fhirResourceId\">'"+addQuotesToExpression(getFhirResourceId())+"'</input>\n" +
+                "            <input name=\"operationType\">\"validate-code\"</input>\n" +
+                "            <input name=\"parameters.url\">"+addQuotesToExpression(getUrl())+"</input>\n" +
+                "            <input name=\"parameters.system\">"+addQuotesToExpression(getSystem())+"</input>\n" +
+                "            <input name=\"parameters.code\">"+addQuotesToExpression(getCode())+"</input>\n" +
                 "        </send>\n";
         return xml;
     }

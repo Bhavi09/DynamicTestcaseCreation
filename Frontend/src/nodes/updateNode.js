@@ -18,7 +18,7 @@ const options = [
   {value: 'ConceptMap', label: 'ConceptMap'}
 ];
 
-function CreateNode({ data, isConnectable }) {
+function UpdateNode({ data, isConnectable }) {
 
   const valueIds = useSelector(state => state.valueIdReducer.valueIds);
 
@@ -33,7 +33,7 @@ function CreateNode({ data, isConnectable }) {
   const handleValueIdChange = (event) => {
     setSelectedValueId(event.target.value);
     data.value['valueId'] = event.target.value;
-    data.value['operationId'] = "created"+event.target.value;
+    data.value['operationId'] = "updated"+event.target.value;
   };
 
 
@@ -42,7 +42,7 @@ function CreateNode({ data, isConnectable }) {
   <Handle type="target" position={Position.Top} id='b' />
   <Box sx={{ width: '100%', backgroundColor: '#1976d2', padding: 1, display: 'flex', justifyContent: 'center' }}>
         <Typography gutterBottom variant="h6" component="div" sx={{ color: 'white' }}>
-          Create
+          Update
         </Typography>
       </Box>
   <FormControl fullWidth>
@@ -83,7 +83,7 @@ function CreateNode({ data, isConnectable }) {
   <TextField
         fullWidth
         id="standard-read-only-input"
-        value={`created${selectedValueId}`}
+        value={`updated${selectedValueId}`}
         label="Operation Id"
         InputProps={{
           readOnly: true,
@@ -97,4 +97,4 @@ function CreateNode({ data, isConnectable }) {
   );
 }
 
-export default CreateNode;
+export default UpdateNode;

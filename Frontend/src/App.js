@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
   MiniMap,
   Controls,
@@ -9,29 +9,30 @@ import ReactFlow, {
   Background,
   BackgroundVariant,
 } from "reactflow";
+import "reactflow/dist/style.css";
+import { useSelector } from "react-redux";
+
 import Button from "@mui/material/Button";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import "./App.css";
 import { notification } from "antd";
 import axios from "axios";
+import { saveAs } from "file-saver";
+
 import CreateNode from "./nodes/createNode.js";
 import DeleteNode from "./nodes/deleteNode.js";
 import OutputNode from "./nodes/outputNode.js";
-import "./text-updater-node.css";
-import "reactflow/dist/style.css";
-import "./dropdown-menu.css";
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import "./App.css";
 import SearchNode from "./nodes/searchNode.js";
 import VerifyNode from "./nodes/verifyNode.js";
-import ReadNode from "./nodes/readNode.js";
-import { useDispatch, useSelector } from "react-redux";
-import Slide from "@mui/material/Slide";
-import Draggable from "react-draggable";
-import Paper from "@mui/material/Paper";
-import { saveAs } from "file-saver";
+import GetByIdNode from "./nodes/getByIdNode";
+import LookupNode from "./nodes/lookupNode";
+import GetHistoryByIdNode from "./nodes/getHistoryById";
+import TranslateNode from "./nodes/translateNode";
+import ValidateCodeNode from "./nodes/validateCodeNode";
+import UpdateNode from "./nodes/updateNode";
+
 import AddResources from "./components/AddResources.js";
 import EditResources from "./components/editResources.js";
-
-
 
 
 const initialNodes = [];
@@ -45,42 +46,28 @@ const testcaseDescription = {
   testCaseNumber: "1",
 };
 
-const nodesName = ["Create", "Read", "Delete", "Verify", "Search", "Output"];
 
 const nodeTypes = {
   CreateNode: CreateNode,
   DeleteNode: DeleteNode,
   SearchNode: SearchNode,
   VerifyNode: VerifyNode,
-  ReadNode: ReadNode,
+  GetByIdNode: GetByIdNode,
   OutputNode: OutputNode,
-};
-
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
-
-const DraggablePaper = (props) => {
-  return (
-    <Draggable
-      handle="#draggable-dialog-title"
-      cancel={'[class*="MuiDialogContent-root"]'}
-    >
-      <Paper {...props} />
-    </Draggable>
-  );
+  LookupNode: LookupNode,
+  GetHistoryByIdNode: GetHistoryByIdNode,
+  TranslateNode: TranslateNode,
+  ValidateCodeNode: ValidateCodeNode,
+  UpdateNode: UpdateNode
 };
 
 export default function App() {
-  
   const bodyValuesFromStore = useSelector(
     (state) => state.valueIdReducer.bodyValues
   );
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [submittedData, setSubmittedData] = useState(null);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const reactFlowWrapper = useRef(null);
   const [selectedNodeType, setSelectedNodeType] = useState("");
   const [editResourceDialogOpen, setEditResourceDialogOpen] = useState(false);
@@ -148,12 +135,14 @@ export default function App() {
     edgeUpdateSuccessful.current = true;
   }, []);
 
+
   // Manage Node
+
   const AddNode = (type) => {
+
     const newNodeId = String(nodes.length + 1);
     const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
     const previousNode = nodes[nodes.length - 1];
-
     const newPosition = previousNode
       ? { x: previousNode.position.x, y: previousNode.position.y + 500 }
       : {
@@ -163,18 +152,23 @@ export default function App() {
 
     const newNode = {
       id: newNodeId,
-      type: `${type}Node`,
+      type: type,
       position: newPosition,
       data: {
         value: {
-          nodeType: type,
+          nodeType: String(type).replace(/Node$/,''),
         },
         onDelete: () => handleDeleteNode(newNodeId),
       },
     };
     setNodes((prevNodes) => [...prevNodes, newNode]);
-    setIsDropdownOpen(false);
     setSelectedNodeType("");
+  };
+
+  const handleNodeSelect = (event) => {
+    const selectedType = event.target.value;
+    setSelectedNodeType(selectedType);
+    AddNode(selectedType);
   };
 
   const handleDeleteNode = useCallback(
@@ -186,6 +180,8 @@ export default function App() {
     },
     [setNodes, setEdges]
   );
+
+  // Submit data
 
   const topologicalSort = (nodes, edges) => {
     const adjList = new Map();
@@ -233,6 +229,7 @@ export default function App() {
       console.log(node.data);
       return node.data.value;
     });
+
     const bodies = [];
     for (let i = 0; i < listOfValueIds.length; i++) {
       bodies.push({
@@ -246,11 +243,12 @@ export default function App() {
       jsonBody.push(node);
     });
 
-    // setSubmittedData(jsonBody);
     postData(jsonBody);
   };
 
   const postData = async (jsonBody) => {
+
+  
     const url = "http://localhost:8080/generateTestcase";
     const urlEncodedBody = encodeURIComponent(JSON.stringify(jsonBody));
     const payload = `testcaseNodes=${urlEncodedBody}`;
@@ -277,32 +275,11 @@ export default function App() {
     }
   };
 
-  const handleNodeSelect = (event) => {
-    const selectedType = event.target.value;
-    setSelectedNodeType(selectedType);
-    AddNode(selectedType);
-  };
-
-  const handleEditResourceDialogOpen = () => {
-    setEditResourceDialogOpen(true);
-  };
-
-
-  const showAllOperationIds = () => {
-    const operationIdsArray = [];
-    topologicalSort(nodes, edges).forEach((node) => {
-      if (!!node.data.value.operationId) {
-        operationIdsArray.push(node.data.value.operationId);
-      }
-    });
-    return operationIdsArray;
-  };
-
-  App.showAllOperationIds = showAllOperationIds;
-
   return (
     <div style={{ display: "flex", height: "100vh" }}>
       <div ref={reactFlowWrapper} style={{ width: "75vw", height: "100vh" }}>
+
+        {/* Viewport */}
         <ReactFlow
           className="reactflow-wrapper"
           nodes={nodes}
@@ -322,13 +299,10 @@ export default function App() {
           <MiniMap />
           <Background variant="dots" gap={12} size={1} />
         </ReactFlow>
-        {submittedData && (
-          <div>
-            <h2>Submitted Data</h2>
-            <pre>{JSON.stringify(submittedData, null, 2)}</pre>
-          </div>
-        )}
       </div>
+
+
+     {/* sidebar */}
       <div
         style={{
           marginLeft: "auto",
@@ -353,7 +327,9 @@ export default function App() {
         <Button
           variant="contained"
           style={{ padding: "10px 20px", fontSize: "16px" }}
-          onClick={handleEditResourceDialogOpen}
+          onClick={() => {
+            setEditResourceDialogOpen(true);
+          }}
         >
           Edit Resources
         </Button>
@@ -368,13 +344,13 @@ export default function App() {
               label="Select Operation"
               onChange={handleNodeSelect}
             >
-              {nodesName.map((element) => (
+              {Object.keys(nodeTypes).map((element) => (
                 <MenuItem
                   value={element}
                   key={element}
                   style={{ display: "block", margin: "5px 0" }}
                 >
-                  {element}
+                  {element.replace(/Node$/,'')}
                 </MenuItem>
               ))}
             </Select>
@@ -395,6 +371,8 @@ export default function App() {
           Submit
         </Button>
       </div>
+
+      {/* Dialog box */}
 
       <AddResources
         openDialogBox={openDialogBox}

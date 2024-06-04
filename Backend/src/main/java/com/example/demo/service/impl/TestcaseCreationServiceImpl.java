@@ -99,7 +99,7 @@ public class TestcaseCreationServiceImpl implements TestcaseCreationService {
         {
             String valueId = body.get("valueId").getAsString();
             String object = gson.toJson(body.getAsJsonObject("value"));
-            String filePath = resourcesDir.resolve(valueId+"ToCreate.json").toString();
+            String filePath = resourcesDir.resolve(valueId+".json").toString();
             FileWriter fileWriter = new FileWriter(filePath);
             fileWriter.write(object);
             fileWriter.close();
@@ -119,7 +119,7 @@ public class TestcaseCreationServiceImpl implements TestcaseCreationService {
         // Importing saved resources
         for (JsonObject body : listOfBodies) {
             String valueId = body.get("valueId").getAsString();
-            xml.append("\t\t<artifact type=\"binary\" encoding=\"UTF-8\" name=\"" +valueId+ "ToCreateInJsonString\">/" + testcaseId + "/resources/" +valueId+ "ToCreate.json</artifact>\n");
+            xml.append("\t\t<artifact type=\"binary\" encoding=\"UTF-8\" name=\"" +valueId+ "InJsonString\">/" + testcaseId + "/resources/" +valueId+ "ToCreate.json</artifact>\n");
         }
 
         xml.append(

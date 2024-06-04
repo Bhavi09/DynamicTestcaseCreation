@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, {useState } from "react";
 import { Handle, Position } from "reactflow";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
-import { FormControl, InputLabel, MenuItem, Select,Box } from "@mui/material";
+import {Box } from "@mui/material";
 
-const handleStyle = { left: 10 };
 
 function OutputNode({ data, isConnectable }) {
 

@@ -7,31 +7,39 @@ import TextField from "@mui/material/TextField";
 import { FormControl, InputLabel, MenuItem, Select,Box } from "@mui/material";
 import App from "../App";
 
-const validators = [
-  { label: "String Validator", value: "StringValidator" },
-  { label: "Number Validator", value: "NumberValidator" },
-  { label: "Expression Validator", value: "ExpressionValidator" },
-];
-function VerifyNode({ data, isConnectable }) {
 
-  const [selectedValidator, setSelectedValidator] = useState("");
-  const [expectedDataValue, setExpectedDataValue] = useState("");
-  const [actualDataValue, setActualDataValue] = useState("");
+const options = [
+    {value: 'Patient', label: 'Patient' },
+    {value: 'Practitioner', label: 'Practitioner' },
+    {value: 'Observation', label:'Observation'},
+    {value: 'DiagnosticReport', label: 'DiagnosticReport'},
+    {value: 'Encounter', label: 'Encounter'},
+    {value: 'CodeSystem', label: 'CodeSystem'},
+    {value: 'ValueSet', label: 'ValueSet'},
+    {value: 'ConceptMap', label: 'ConceptMap'}
+  ];
+
+function LookupNode({ data, isConnectable }) {
+
+  const [selectedResource, setSelectedResource] = useState('');
+  const [systemDataValue, setSystemDataValue] = useState("");
+  const [codeDataValue, setCodeDataValue] = useState("");
   const [operationIdValue, setOperationIdValue] = useState("");
 
-  const handleValidatorChange = (event) => {
-    setSelectedValidator(event.target.value);
-    data.value["handler"] = event.target.value;
+
+  const handleResourceChange = (event) => {;
+    setSelectedResource(event.target.value);
+    data.value['resourceType'] = event.target.value;
   };
 
-  const handleActualDataChange = (event) => {
-    setActualDataValue(event.target.value);
-    data.value["actualData"] = event.target.value;
+  const handleSystemDataChange = (event) => {
+    setSystemDataValue(event.target.value);
+    data.value["system"] = event.target.value;
   };
 
-  const handleExpectedDataChange = (event) => {
-    setExpectedDataValue(event.target.value);
-    data.value["expectedData"] = event.target.value;
+  const handleCodeDataChange = (event) => {
+    setCodeDataValue(event.target.value);
+    data.value["code"] = event.target.value;
   };
 
   const handleOperationIdDataChange = (event) => {
@@ -54,36 +62,36 @@ function VerifyNode({ data, isConnectable }) {
       <Handle type="target" position={Position.Top} id="b" />
       <Box sx={{ width: '100%', backgroundColor: '#1976d2', padding: 1, display: 'flex', justifyContent: 'center' }}>
         <Typography gutterBottom variant="h6" component="div" sx={{ color: 'white' }}>
-          Verify
+          Lookup
         </Typography>
       </Box>
       <FormControl fullWidth>
-        <InputLabel>Validators</InputLabel>
-        <Select
-          value={selectedValidator}
-          label="Validators"
-          onChange={handleValidatorChange}
-          className="nodrag"
-        >
-          {validators.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+    <InputLabel>Resource Type</InputLabel>
+    <Select
+      value={selectedResource}
+      label="Resource Type"
+      onChange={handleResourceChange}
+      className="nodrag"
+    >
+      {options.map((option) => (
+        <MenuItem key={option.value} value={option.value}>
+          {option.label}
+        </MenuItem>
+      ))}
+    </Select>
+  </FormControl>
       <TextField
         id="textfilled-basic"
-        label="Actual Data"
-        value={actualDataValue}
-        onChange={handleActualDataChange}
+        label="System"
+        value={systemDataValue}
+        onChange={handleSystemDataChange}
         fullWidth
       />
       <TextField
         id="textfilled-basic"
-        label="Expected Data"
-        value={expectedDataValue}
-        onChange={handleExpectedDataChange}
+        label="Code"
+        value={codeDataValue}
+        onChange={handleCodeDataChange}
         fullWidth
       />
 
@@ -108,4 +116,4 @@ function VerifyNode({ data, isConnectable }) {
   );
 }
 
-export default VerifyNode;
+export default LookupNode;
