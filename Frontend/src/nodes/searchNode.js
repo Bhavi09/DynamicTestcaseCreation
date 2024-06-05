@@ -5,18 +5,8 @@ import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import { FormControl, InputLabel, MenuItem, Select,Box } from '@mui/material';
+import { options } from '../constants/options';
 
-
-const options = [
-  {value: 'Patient', label: 'Patient' },
-  {value: 'Practitioner', label: 'Practitioner' },
-  {value: 'Observation', label:'Observation'},
-  {value: 'DiagnosticReport', label: 'DiagnosticReport'},
-  {value: 'Encounter', label: 'Encounter'},
-  {value: 'CodeSystem', label: 'CodeSystem'},
-  {value: 'ValueSet', label: 'ValueSet'},
-  {value: 'ConceptMap', label: 'ConceptMap'}
-];
 function SearchNode({ data, isConnectable }) {
   const [selectedResource, setSelectedResource] = useState("");
   const [parameterValue, setParameterValue] = useState("");

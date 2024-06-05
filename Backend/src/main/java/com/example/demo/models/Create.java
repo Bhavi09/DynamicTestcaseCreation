@@ -52,7 +52,7 @@ public class Create implements GenerationLogic {
                         "    <input name=\"username\">$username</input>\n" +
                         "    <input name=\"password\">$password</input>\n" +
                         "    <input name=\"operationType\">\"create\"</input>\n" +
-                        "    <input name=\"body\">$"+getValueId()+"ToCreateInJsonString</input>\n" +
+                        "    <input name=\"body\">$"+getValueId()+"InJsonString</input>\n" +
                         "    <input name=\"bodyType\">\"jsonString\"</input>\n" +
                         "</send>\n" +
 

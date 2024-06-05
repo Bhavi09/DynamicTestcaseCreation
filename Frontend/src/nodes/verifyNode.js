@@ -5,7 +5,6 @@ import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import { FormControl, InputLabel, MenuItem, Select,Box } from "@mui/material";
-import App from "../App";
 
 const validators = [
   { label: "String Validator", value: "StringValidator" },

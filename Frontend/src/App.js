@@ -105,12 +105,23 @@ export default function App() {
   };
 
   const onConnect = useCallback(
-    (params) =>
-      setEdges((eds) =>
-        addEdge({ ...params, markerEnd: "url(#arrowhead)" }, eds)
-      ),
+    (params) => {
+      const { source, sourceHandle, target, targetHandle } = params;
+
+      // Custom logic to allow only specific handle connections
+      if (
+        (sourceHandle === 'bottom' && targetHandle === 'right-bottom') ||
+        (sourceHandle === 'bottom' && targetHandle === 'top') ||
+        // Add other allowed connections here if needed
+        true
+      ) {
+        setEdges((eds) =>
+          addEdge({ ...params, markerEnd: 'url(#arrowhead)' }, eds)
+        );
+      }
+    },
     [setEdges]
-  );
+  );  
 
   const onEdgeUpdateStart = useCallback(() => {
     edgeUpdateSuccessful.current = false;

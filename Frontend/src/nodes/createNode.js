@@ -6,17 +6,7 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import { FormControl, InputLabel, MenuItem, Select,Box } from '@mui/material';
 import { useSelector } from 'react-redux';
-
-const options = [
-  {value: 'Patient', label: 'Patient' },
-  {value: 'Practitioner', label: 'Practitioner' },
-  {value: 'Observation', label:'Observation'},
-  {value: 'DiagnosticReport', label: 'DiagnosticReport'},
-  {value: 'Encounter', label: 'Encounter'},
-  {value: 'CodeSystem', label: 'CodeSystem'},
-  {value: 'ValueSet', label: 'ValueSet'},
-  {value: 'ConceptMap', label: 'ConceptMap'}
-];
+import { options } from '../constants/options';
 
 function CreateNode({ data, isConnectable }) {
 
@@ -39,7 +29,7 @@ function CreateNode({ data, isConnectable }) {
 
   return (
 <Card sx={{ padding: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, minWidth: 300, minHeight: 100 }}>
-  <Handle type="target" position={Position.Top} id='b' />
+  <Handle type="target" position={Position.Top} id='top' />
   <Box sx={{ width: '100%', backgroundColor: '#1976d2', padding: 1, display: 'flex', justifyContent: 'center' }}>
         <Typography gutterBottom variant="h6" component="div" sx={{ color: 'white' }}>
           Create
@@ -91,7 +81,9 @@ function CreateNode({ data, isConnectable }) {
         variant='standard'
       />
   <Button variant="contained" onClick={data.onDelete} sx={{ marginTop: 2 }}>Delete</Button>
-  <Handle type="source" position={Position.Bottom} id='b' isConnectable={isConnectable} />
+  <Handle type="source" position={Position.Bottom} id='bottom' isConnectable={isConnectable} />
+  <Handle type="source" position={Position.Right} id='right-top' style={{ top: '10%' }} isConnectable={isConnectable} />
+      <Handle type="target" position={Position.Right} id='right-bottom' style={{ top: '90%' }} isConnectable={isConnectable} />
 </Card>
 
   );

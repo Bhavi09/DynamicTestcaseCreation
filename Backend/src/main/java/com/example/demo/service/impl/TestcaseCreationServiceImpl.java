@@ -119,7 +119,7 @@ public class TestcaseCreationServiceImpl implements TestcaseCreationService {
         // Importing saved resources
         for (JsonObject body : listOfBodies) {
             String valueId = body.get("valueId").getAsString();
-            xml.append("\t\t<artifact type=\"binary\" encoding=\"UTF-8\" name=\"" +valueId+ "InJsonString\">/" + testcaseId + "/resources/" +valueId+ "ToCreate.json</artifact>\n");
+            xml.append("\t\t<artifact type=\"binary\" encoding=\"UTF-8\" name=\"" +valueId+ "InJsonString\">/" + testcaseId + "/resources/" +valueId+ ".json</artifact>\n");
         }
 
         xml.append(
