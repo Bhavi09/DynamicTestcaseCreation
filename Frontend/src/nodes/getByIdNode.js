@@ -26,7 +26,14 @@ function GetByIdNode({ data, isConnectable }) {
     setOperationIdValue(event.target.value);
     data.value["operationId"] = event.target.value;
   }
-
+  const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: 48 * 4 + 8, // 5 items * item height (48px) + padding (8px)
+        width: 200,
+      },
+    },
+  };
   return (
       <Card sx={{ padding: 2, display: 'flex', flexDirection: 'column',alignItems:'center', gap: 2,minWidth: 300, minHeight: 100 }}>    
       <Handle type="target" position={Position.Top} id='b' />
@@ -42,6 +49,7 @@ function GetByIdNode({ data, isConnectable }) {
             label="Resource Type"
             onChange={handleSelectChange}
             className="nodrag"
+            MenuProps={MenuProps}
           >
             {options.map((option) => (
               <MenuItem key={option.value} value={option.value}>

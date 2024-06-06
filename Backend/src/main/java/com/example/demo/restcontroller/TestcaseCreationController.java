@@ -6,8 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 
 @RestController
@@ -21,7 +24,8 @@ public class TestcaseCreationController {
     }
 
     @PostMapping("/generateTestcase")
-    public ResponseEntity<Resource> generateTestcaseInXML(@RequestParam(value = "testcaseNodes") String testcaseNodes) throws Exception {
+    public ResponseEntity<Resource> generateTestcaseInXML(@RequestBody Map<String, String>request) throws Exception {
+        String testcaseNodes = request!=null?request.get("testcaseNodes"):null;
         return testcaseCreationService.testcaseInXML(testcaseNodes);
     }
 

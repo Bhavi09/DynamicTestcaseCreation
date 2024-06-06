@@ -40,6 +40,14 @@ function ValidateCodeNode({ data, isConnectable }) {
     setOperationIdValue(event.target.value);
     data.value["operationId"] = event.target.value;
   }
+  const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: 48 * 4 + 8, // 5 items * item height (48px) + padding (8px)
+        width: 200,
+      },
+    },
+  };
 
   return (
     <Card
@@ -66,6 +74,7 @@ function ValidateCodeNode({ data, isConnectable }) {
       label="Resource Type"
       onChange={handleResourceChange}
       className="nodrag"
+      MenuProps={MenuProps}
     >
       {options.map((option) => (
         <MenuItem key={option.value} value={option.value}>

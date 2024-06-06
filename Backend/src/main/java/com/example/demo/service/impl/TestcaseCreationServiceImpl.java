@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -41,8 +42,9 @@ public class TestcaseCreationServiceImpl implements TestcaseCreationService {
 
         StringBuilder xml = new StringBuilder();
 
+        String decodedJsonString = URLDecoder.decode(testcaseNodes, "UTF-8");
         // Parse the JSON array string into a JsonArray
-        JsonArray jsonArray = JsonParser.parseString(testcaseNodes).getAsJsonArray();
+        JsonArray jsonArray = JsonParser.parseString(decodedJsonString).getAsJsonArray();
 
         JsonElement jsonElement = jsonArray.get(0);
         JsonObject jsonObject = jsonElement.getAsJsonObject();

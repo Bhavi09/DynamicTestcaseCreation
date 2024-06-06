@@ -30,6 +30,7 @@ import GetHistoryByIdNode from "./nodes/getHistoryById";
 import TranslateNode from "./nodes/translateNode";
 import ValidateCodeNode from "./nodes/validateCodeNode";
 import UpdateNode from "./nodes/updateNode";
+import LoopNode from "./nodes/loopNode";
 
 import AddResources from "./components/AddResources.js";
 import EditResources from "./components/editResources.js";
@@ -58,7 +59,8 @@ const nodeTypes = {
   GetHistoryByIdNode: GetHistoryByIdNode,
   TranslateNode: TranslateNode,
   ValidateCodeNode: ValidateCodeNode,
-  UpdateNode: UpdateNode
+  UpdateNode: UpdateNode,
+  LoopNode: LoopNode
 };
 
 export default function App() {
@@ -235,12 +237,45 @@ export default function App() {
 
   let listOfValueIds = useSelector((state) => state.valueIdReducer.valueIds);
 
-  const handleSubmit = () => {
-    const connectedNodes = topologicalSort(nodes, edges).map((node) => {
-      console.log(node.data);
-      return node.data.value;
-    });
+  const buildNodeJson = (nodeId, visited) => {
+    visited.add(nodeId);
+  
+    let connectedEdge = edges.find((edge) => edge.source === nodeId && edge.sourceHandle === 'right-center');
+    const nodeJson = [];
 
+    while(connectedEdge)
+    {
+      const targetId = connectedEdge.target;
+        if (!visited.has(targetId)) {
+        const node = nodes.find((n) => n.id === targetId);
+        const nodeData = {
+          nodeType: node.data.label,
+          ...node.data.value,
+        };
+        const childNodeJson = buildNodeJson(targetId, visited);
+        if (childNodeJson.length > 0) {
+          nodeData.nodeJson = childNodeJson;
+        }
+        nodeJson.push(nodeData);
+        connectedEdge = edges.find((edge) => edge.source === node.id && !visited.has(edge.target));
+
+    }
+  }
+    return nodeJson;
+  };
+  
+
+  const handleSubmit = () => {
+    const visited = new Set();
+  
+    const connectedNodes = topologicalSort(nodes, edges).map((node) => {
+      return {
+        id: node.id,
+        nodeType: node.data.label,
+        ...node.data.value,
+      };
+    });
+  
     const bodies = [];
     for (let i = 0; i < listOfValueIds.length; i++) {
       bodies.push({
@@ -248,25 +283,42 @@ export default function App() {
         value: JSON.parse(bodyValuesFromStore[listOfValueIds[i]].resource),
       });
     }
-
+  
     const jsonBody = [testcaseDescription, { bodies: bodies }];
+  
     connectedNodes.forEach((node) => {
-      jsonBody.push(node);
+      if (!visited.has(node.id)) {
+        if (node.nodeType === 'Loop') {
+          const loopNode = {
+            ...node,
+            nodeJson: buildNodeJson(node.id, visited),
+          };
+          delete loopNode.id;
+          jsonBody.push(loopNode);
+        } else {
+          delete node.id;
+          jsonBody.push(node);
+        }
+        visited.add(node.id);
+      }
     });
-
+  
+    console.log(jsonBody);
     postData(jsonBody);
   };
+  
+
 
   const postData = async (jsonBody) => {
 
   
     const url = "http://localhost:8080/generateTestcase";
     const urlEncodedBody = encodeURIComponent(JSON.stringify(jsonBody));
-    const payload = `testcaseNodes=${urlEncodedBody}`;
+    const payload = { testcaseNodes: urlEncodedBody };
     try {
       const response = await axios.post(url, payload, {
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          "Content-Type": "application/json",
         },
         responseType: "blob",
       });
@@ -284,6 +336,16 @@ export default function App() {
         placement: "top",
       });
     }
+  };
+
+
+  const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: 48 * 7 + 8, // 5 items * item height (48px) + padding (8px)
+        width: 250,
+      },
+    },
   };
 
   return (
@@ -354,6 +416,7 @@ export default function App() {
               value={selectedNodeType}
               label="Select Operation"
               onChange={handleNodeSelect}
+              MenuProps={MenuProps}
             >
               {Object.keys(nodeTypes).map((element) => (
                 <MenuItem

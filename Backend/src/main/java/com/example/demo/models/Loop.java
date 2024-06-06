@@ -2,13 +2,15 @@ package com.example.demo.models;
 
 import com.example.demo.service.GenerationFactory;
 import com.example.demo.service.GenerationLogic;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 public class Loop implements GenerationLogic {
+
+    String nodeType;
 
     String index;
 
@@ -16,24 +18,7 @@ public class Loop implements GenerationLogic {
 
     String end;
 
-    String nodeJson;
-
-    GenerationFactory generationFactory;
-
-    @Autowired
-    public void setGenerationFactory(GenerationFactory generationFactory){
-        this.generationFactory = generationFactory;
-    }
-
-    public Loop() {
-    }
-
-    public Loop(String index, String start, String end, String nodeJson) {
-        this.index = index;
-        this.start = start;
-        this.end = end;
-        this.nodeJson = nodeJson;
-    }
+    List<Object> nodeJson;
 
     public String getIndex() {
         return index;
@@ -59,21 +44,34 @@ public class Loop implements GenerationLogic {
         this.end = end;
     }
 
-    public String getNodeJson() {
+    public List<Object> getNodeJson() {
         return nodeJson;
     }
 
-    public void setNodeJson(String nodeJson) {
+    public void setNodeJson(List<Object> nodeJson) {
         this.nodeJson = nodeJson;
     }
 
-    public String generate() throws Exception {
-        StringBuilder xml = new StringBuilder();
+    public String getNodeType() {
+        return nodeType;
+    }
+
+    public void setNodeType(String nodeType) {
+        this.nodeType = nodeType;
+    }
+
+    public String generate() throws Exception {        StringBuilder xml = new StringBuilder();
 
         xml.append("\t<foreach desc=\"IterateList\" counter=\"" + getIndex() + "\" start=\"" + getStart() + "\" end=\"" + getEnd() + "\">\n" +
                 "\t\t<do>\n");
 
-        JsonArray loopNodesArray =  JsonParser.parseString(getNodeJson()).getAsJsonArray();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        String nodes = objectMapper.writeValueAsString(getNodeJson());
+
+        JsonArray loopNodesArray =  JsonParser.parseString(nodes==null?"[]":nodes).getAsJsonArray();
+
+        GenerationFactory generationFactory = new GenerationFactory();
 
         List<GenerationLogic> loopNodes = generationFactory.getAllGenerationLogicInSequence(loopNodesArray);
 

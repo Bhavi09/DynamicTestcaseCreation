@@ -28,6 +28,15 @@ function SearchNode({ data, isConnectable }) {
     data.value['parameters'] = event.target.value;
   };
 
+  const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: 48 * 4 + 8, // 5 items * item height (48px) + padding (8px)
+        width: 200,
+      },
+    },
+  };
+
   return (
     <Card
       sx={{
@@ -53,6 +62,7 @@ function SearchNode({ data, isConnectable }) {
           label="Resource Type"
           onChange={handleResourceChange}
           className="nodrag"
+          MenuProps={MenuProps}
         >
           {options.map((option) => (
             <MenuItem key={option.value} value={option.value}>

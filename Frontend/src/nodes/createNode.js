@@ -26,6 +26,14 @@ function CreateNode({ data, isConnectable }) {
     data.value['operationId'] = "created"+event.target.value;
   };
 
+  const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: 48 * 4 + 8, // 5 items * item height (48px) + padding (8px)
+        width: 200,
+      },
+    },
+  };
 
   return (
 <Card sx={{ padding: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, minWidth: 300, minHeight: 100 }}>
@@ -42,6 +50,7 @@ function CreateNode({ data, isConnectable }) {
       label="Resource Type"
       onChange={handleResourceChange}
       className="nodrag"
+      MenuProps={MenuProps}
     >
       {options.map((option) => (
         <MenuItem key={option.value} value={option.value}>
@@ -57,6 +66,7 @@ function CreateNode({ data, isConnectable }) {
       label="Resource Id"
       onChange={handleValueIdChange}
       className="nodrag"
+      MenuProps={MenuProps}
     >
       
       {valueIds.length === 0 ? (
@@ -82,9 +92,7 @@ function CreateNode({ data, isConnectable }) {
       />
   <Button variant="contained" onClick={data.onDelete} sx={{ marginTop: 2 }}>Delete</Button>
   <Handle type="source" position={Position.Bottom} id='bottom' isConnectable={isConnectable} />
-  <Handle type="source" position={Position.Right} id='right-top' style={{ top: '10%' }} isConnectable={isConnectable} />
-      <Handle type="target" position={Position.Right} id='right-bottom' style={{ top: '90%' }} isConnectable={isConnectable} />
-</Card>
+  </Card>
 
   );
 }

@@ -5,7 +5,6 @@
     "testcaseName": "Verify system can do crud operations",
     "description": "Testcase description",
     "testCaseNumber": "1"
-
   },
   {
     "bodies": [
@@ -82,7 +81,7 @@
     "resourceType" : "CodeSystem",
     "system" : "",
     "code" : "chol-mmol",
-    "operationId" : "lookup"  
+    "operationId" : "lookup"
   },
   {
     "nodeType": "Loop",
@@ -93,16 +92,48 @@
       {
         "nodeType": "Create",
         "resourceType": "Patient",
-        "valueId": "PatientId"
-      },
-      {
-        "nodeType": "Search",
-        "resourceType": "Patient"
+        "valueId": "Patient1",
+        "operationId": "Patient1ToCreate"
       },
       {
         "nodeType": "Delete",
         "resourceType": "Patient",
-        "fhirResourceId": "Patient123"
+        "fhirResourceId": "Patien1",
+        "operationId": "deletedPatient"
+      }
+    ]
+  },
+  {
+    "nodeType": "Loop",
+    "index": "counter",
+    "start": "0",
+    "end": "$searchedPatient{response}{body}{link}{size}",
+    "nodeJson": [
+      {
+        "nodeType": "Create",
+        "resourceType": "Patient",
+        "valueId": "Patient1",
+        "operationId": "Patient1ToCreate"
+      },
+      {
+        "nodeType": "Delete",
+        "resourceType": "Patient",
+        "fhirResourceId": "Patien1",
+        "operationId": "deletedPatient"
+      },
+      {
+        "nodeType": "Verify",
+        "handler": "StringValidator",
+        "actualData": "$createdPatient1{response}{body}{name}",
+        "expectedData": "Jane Doe",
+        "operationId": "verifyPatient"
+      },
+      {
+        "nodeType": "Lookup",
+        "resourceType" : "CodeSystem",
+        "system" : "",
+        "code" : "chol-mmol",
+        "operationId" : "lookup"
       }
     ]
   },
