@@ -1,15 +1,15 @@
-package com.example.demo.models;
+package com.example.demo.generateXml.models;
 
-import com.example.demo.service.GenerationLogic;
+import com.example.demo.generateXml.service.GenerationLogic;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Translate implements GenerationLogic
-{
+public class Lookup implements GenerationLogic {
+
+
     String nodeType;
     String resourceType;
-    String url;
     String system;
     String code;
     String operationId;
@@ -28,14 +28,6 @@ public class Translate implements GenerationLogic
 
     public void setResourceType(String resourceType) {
         this.resourceType = resourceType;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     public String getSystem() {
@@ -63,18 +55,16 @@ public class Translate implements GenerationLogic
     }
 
     @Override
-    public String generate()
-    {
-        String xml = "\n        <send id=\""+getOperationId()+"\" desc=\"Perform translate operation\" from=\"ITB\" to=\"FhirHandler\" handler=\"$DOMAIN{fhirContextServiceAddress}\">\n" +
+    public String generate() {
+        String xml = "\n     <send id=\""+getOperationId()+"\" desc=\"Perform lookup operation\" from=\"ITB\" to=\"FhirHandler\" handler=\"$DOMAIN{fhirContextServiceAddress}\">\n" +
                 "            <input name=\"fhirServerBaseUrl\">$componentURI</input>\n" +
                 "            <input name=\"username\">$username</input>\n" +
                 "            <input name=\"password\">$password</input>\n" +
                 "            <input name=\"fhirResourceType\">"+getResourceType()+"</input>\n" +
-                "            <input name=\"operationType\">\"translate\"</input>\n" +
-                "            <input name=\"parameters.url\">"+addQuotesToExpression(getUrl())+"</input>\n" +
+                "            <input name=\"operationType\">\"lookup\"</input>\n" +
                 "            <input name=\"parameters.system\">"+addQuotesToExpression(getSystem())+"</input>\n" +
                 "            <input name=\"parameters.code\">"+addQuotesToExpression(getCode())+"</input>\n" +
-                "        </send>\n";
+                "            </send>\n";
         return xml;
     }
 

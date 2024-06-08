@@ -11,10 +11,10 @@ import { options } from '../constants/options';
 
 function LookupNode({ data, isConnectable }) {
 
-  const [selectedResource, setSelectedResource] = useState('');
-  const [systemDataValue, setSystemDataValue] = useState("");
-  const [codeDataValue, setCodeDataValue] = useState("");
-  const [operationIdValue, setOperationIdValue] = useState("");
+  const [selectedResource, setSelectedResource] = useState(data.value.resourceType || '');
+  const [systemDataValue, setSystemDataValue] = useState(data.value.system || '');
+  const [codeDataValue, setCodeDataValue] = useState(data.value.code || '');
+  const [operationIdValue, setOperationIdValue] = useState(data.value.operationId || '');
 
 
   const handleResourceChange = (event) => {;

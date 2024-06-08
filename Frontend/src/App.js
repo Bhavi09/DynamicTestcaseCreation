@@ -13,7 +13,7 @@ import "reactflow/dist/style.css";
 import { useSelector } from "react-redux";
 
 import Button from "@mui/material/Button";
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { FormControl, InputLabel, MenuItem, Select,Autocomplete, TextField } from "@mui/material";
 import "./App.css";
 import { notification } from "antd";
 import axios from "axios";
@@ -178,11 +178,13 @@ export default function App() {
     setSelectedNodeType("");
   };
 
-  const handleNodeSelect = (event) => {
-    const selectedType = event.target.value;
+const handleNodeSelect = (event, newValue) => {
+  if (newValue) {
+    const selectedType = newValue;
     setSelectedNodeType(selectedType);
     AddNode(selectedType);
-  };
+  }
+};
 
   const handleDeleteNode = useCallback(
     (nodeId) => {
@@ -302,8 +304,11 @@ export default function App() {
         visited.add(node.id);
       }
     });
-  
-    console.log(jsonBody);
+    console.log("Nodes....");
+    console.log(nodes);
+    console.log("Edges...");
+    console.log(edges);
+    // console.log(jsonBody);
     postData(jsonBody);
   };
   
@@ -337,6 +342,97 @@ export default function App() {
       });
     }
   };
+
+  const handleSave = ()=>
+  {
+    const flow = {
+      id:testcaseDescription.specificationName+"-"+testcaseDescription.testCaseNumber,
+      componentName: testcaseDescription.componentName,
+      specificationName: testcaseDescription.specificationName,
+      testcaseName: testcaseDescription.testcaseName,
+      description: testcaseDescription.description,
+      testCaseNumber: testcaseDescription.testCaseNumber,
+      nodes: nodes.map(node => ({
+        nodeId: node.id,
+        nodeType: node.type,
+        positionX: node.position.x,
+        positionY: node.position.y,
+        data: node.data ? Object.values(node.data) : [],
+      })),
+      edges: edges.map(edge => ({
+        source: edge.source,
+        target: edge.target,
+        sourceHandle: edge.sourceHandle,
+        targetHandle: edge.targetHandle,
+      })),
+    };
+    console.log(flow);
+    saveFlow(flow);
+  }
+
+  const saveFlow = async (flow) => {
+    try {
+      const response = await axios.post('http://localhost:8080/api/flows', flow, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      notification.success({
+        message: 'Success',
+        description: 'Flow has been saved successfully',
+        placement: 'top',
+      });
+      return response.data;
+    } catch (error) {
+      notification.error({
+        message: 'Error',
+        description: 'Failed to save the flow',
+        placement: 'top',
+      });
+    }
+  };
+
+  const fetchFlow = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/flows/CRF1-1');
+      const flow = response.data;
+      console.log("Fetched flow");
+      console.log(flow);
+      // Transform fetched flow to nodes and edges format
+      const fetchedNodes = flow.nodes.map((node) => ({
+        id: node.nodeId,
+        type: node.nodeType,
+        position: { x: node.positionX, y: node.positionY },
+        data: {
+          value: {
+            ...node.data[0]
+          },
+
+          onDelete: () => handleDeleteNode(node.nodeId),
+        },
+      }));
+
+      const fetchedEdges = flow.edges.map((edge) => ({
+        id: `reactflow__edge-${edge.source}-${edge.sourceHandle}-${edge.target}-${edge.targetHandle}`,
+        source: edge.source,
+        target: edge.target,
+        sourceHandle: edge.sourceHandle,
+        targetHandle: edge.targetHandle,
+        markerEnd: 'url(#arrowhead)',
+      }));
+
+      setNodes(fetchedNodes);
+      setEdges(fetchedEdges);
+    } catch (error) {
+      console.error('Failed to fetch flow', error);
+      setNodes(initialNodes);
+      setEdges(initialEdges);
+    }
+  };
+
+  useEffect(() => {
+    fetchFlow();
+  }, []);
 
 
   const MenuProps = {
@@ -407,43 +503,58 @@ export default function App() {
           Edit Resources
         </Button>
 
-        <div style={{ position: "relative" }}>
-          <FormControl variant="filled" style={{ minWidth: 200 }}>
-            <InputLabel>Select Operation</InputLabel>
-            <Select
-              id="demo-simple-select"
-              style={{ padding: "10px 20px", fontSize: "16px" }}
-              value={selectedNodeType}
-              label="Select Operation"
-              onChange={handleNodeSelect}
-              MenuProps={MenuProps}
-            >
-              {Object.keys(nodeTypes).map((element) => (
-                <MenuItem
-                  value={element}
-                  key={element}
-                  style={{ display: "block", margin: "5px 0" }}
-                >
-                  {element.replace(/Node$/,'')}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </div>
-        <Button
-          variant="contained"
-          style={{
-            position: "absolute",
-            padding: "10px 20px",
-            fontSize: "16px",
-            bottom: "40px",
-            left: "30px",
-            width: "150px",
-          }}
-          onClick={handleSubmit}
-        >
-          Submit
-        </Button>
+        <div style={{ position: "relative", margin: "20px 0" }}>
+  <Autocomplete
+    id="operation-select"
+    options={Object.keys(nodeTypes)}
+    getOptionLabel={(option) => option.replace(/Node$/, '')}
+    value={selectedNodeType}
+    onChange={(event, newValue) => {
+      setSelectedNodeType(newValue);
+      if (newValue) {
+        AddNode(newValue);
+      }
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        label="Select Operation"
+        variant="filled"
+        style={{ width: 200 }}
+      />
+    )}
+    renderOption={(props, option) => (
+      <MenuItem {...props} value={option} style={{ display: "block", margin: "5px 0" }}>
+        {option.replace(/Node$/, '')}
+      </MenuItem>
+    )}
+    sx={{ minWidth: 200 }}
+  />
+</div>
+
+<Button
+    variant="contained"
+    style={{
+      padding: "10px 20px",
+      fontSize: "16px",
+      marginTop: "auto",
+    }}
+    onClick={handleSave}
+  >
+    Save
+  </Button>
+  <Button
+    variant="contained"
+    style={{
+      padding: "10px 20px",
+      fontSize: "16px",
+      marginTop: "10px",
+      marginBottom: "30px"
+    }}
+    onClick={handleSubmit}
+  >
+    Submit
+  </Button>
       </div>
 
       {/* Dialog box */}

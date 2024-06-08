@@ -8,9 +8,9 @@ import { FormControl, InputLabel, MenuItem, Select,Box } from '@mui/material';
 import { options } from '../constants/options';
 
 function GetByIdNode({ data, isConnectable }) {
-  const [selectedOption, setSelectedOption] = useState("");
-  const [fhirResourceIdValue, setFhirResourceId] = useState("");
-  const [operationIdValue, setOperationIdValue] = useState("");
+  const [selectedOption, setSelectedOption] = useState(data.value.resourceType || '');
+  const [fhirResourceIdValue, setFhirResourceId] = useState(data.value.fhirResourceId || '');
+  const [operationIdValue, setOperationIdValue] = useState(data.value.operationId || '');
 
   const handleSelectChange = (event) => {
     setSelectedOption(event.target.value);

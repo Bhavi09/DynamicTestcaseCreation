@@ -1,6 +1,6 @@
-package com.example.demo.models;
+package com.example.demo.generateXml.models;
 
-import com.example.demo.service.GenerationLogic;
+import com.example.demo.generateXml.service.GenerationLogic;
 
 public class Update implements GenerationLogic {
 

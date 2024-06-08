@@ -1,6 +1,6 @@
-package com.example.demo.service;
+package com.example.demo.generateXml.service;
 
-import com.example.demo.models.*;
+import com.example.demo.generateXml.models.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -52,7 +52,7 @@ public class GenerationFactory {
                     yield objectmapper.readValue(jsonString, Output.class);
                 }
                 case "GetHistoryById" -> {
-                    yield objectmapper.readValue(jsonString,GetHistoryById.class);
+                    yield objectmapper.readValue(jsonString, GetHistoryById.class);
                 }
                 case "Lookup" -> {
                     yield objectmapper.readValue(jsonString, Lookup.class);

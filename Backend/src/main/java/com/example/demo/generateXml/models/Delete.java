@@ -1,16 +1,25 @@
-package com.example.demo.models;
+package com.example.demo.generateXml.models;
 
-import com.example.demo.service.GenerationLogic;
+import com.example.demo.generateXml.service.GenerationLogic;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Expand implements GenerationLogic {
+public class Delete implements GenerationLogic {
 
     String nodeType;
     String resourceType;
-    String url;
+    String fhirResourceId;
     String operationId;
+
+    public Delete() {
+    }
+
+    public Delete(String nodeType, String fhirResourceId, String resourceType) {
+        this.nodeType = nodeType;
+        this.fhirResourceId = fhirResourceId;
+        this.resourceType = resourceType;
+    }
 
     public String getNodeType() {
         return nodeType;
@@ -20,20 +29,20 @@ public class Expand implements GenerationLogic {
         this.nodeType = nodeType;
     }
 
+    public String getFhirResourceId() {
+        return fhirResourceId;
+    }
+
+    public void setFhirResourceId(String fhirResourceId) {
+        this.fhirResourceId = fhirResourceId;
+    }
+
     public String getResourceType() {
         return resourceType;
     }
 
     public void setResourceType(String resourceType) {
         this.resourceType = resourceType;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     public String getOperationId() {
@@ -45,14 +54,16 @@ public class Expand implements GenerationLogic {
     }
 
     @Override
-    public String generate() {
-        String xml = "\n        <send id=\""+getOperationId()+"\" desc=\"Perform expand operation\" from=\"ITB\" to=\"FhirHandler\" handler=\"$DOMAIN{fhirContextServiceAddress}\">\n" +
+    public String generate()
+    {
+        String xml = "\n         <send id=\""+getOperationId()+"\" desc=\"delete "+getResourceType()+" from the FHIR server\" from=\"ITB\" to=\"FhirHandler\"\n" +
+                "                handler=\"$DOMAIN{fhirContextServiceAddress}\">\n" +
                 "            <input name=\"fhirServerBaseUrl\">$componentURI</input>\n" +
                 "            <input name=\"username\">$username</input>\n" +
                 "            <input name=\"password\">$password</input>\n" +
+                "            <input name=\"operationType\">\"delete\"</input>\n" +
                 "            <input name=\"fhirResourceType\">"+getResourceType()+"</input>\n" +
-                "            <input name=\"operationType\">\"expand\"</input>\n" +
-                "            <input name=\"parameters.url\""+addQuotesToExpression(getUrl())+"</input>\n" +
+                "            <input name=\"fhirResourceId\">'"+addQuotesToExpression(getFhirResourceId())+"'</input>\n" +
                 "        </send>\n";
         return xml;
     }

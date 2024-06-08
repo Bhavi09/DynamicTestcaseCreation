@@ -9,8 +9,8 @@ import {Box } from "@mui/material";
 
 function OutputNode({ data, isConnectable }) {
 
-  const [successMessageValue, setSuccessMessageValue] = useState("");
-  const [failMessageValue, setFailureMessageValue] = useState("");
+  const [successMessageValue, setSuccessMessageValue] = useState(data.value.successMessage || '');
+  const [failMessageValue, setFailureMessageValue] = useState(data.value.failureMessage || '');
 
 
   const handleSuccessMessageValueChange = (event) => {

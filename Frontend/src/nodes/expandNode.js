@@ -10,9 +10,9 @@ import { options } from '../constants/options';
 
 function TranslateNode({ data, isConnectable }) {
 
-  const [selectedResource, setSelectedResource] = useState("");
-  const [urlDataValue, setUrlDataValue] = useState("");
-  const [operationIdValue, setOperationIdValue] = useState("");
+  const [selectedResource, setSelectedResource] = useState(data.value.resourceType || '');
+  const [urlDataValue, setUrlDataValue] = useState(data.value.url || '');
+  const [operationIdValue, setOperationIdValue] = useState(data.value.operationId || '');
 
 
   const handleResourceChange = (event) => {;

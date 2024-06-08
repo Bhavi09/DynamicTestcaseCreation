@@ -13,10 +13,10 @@ const validators = [
 ];
 function VerifyNode({ data, isConnectable }) {
 
-  const [selectedValidator, setSelectedValidator] = useState("");
-  const [expectedDataValue, setExpectedDataValue] = useState("");
-  const [actualDataValue, setActualDataValue] = useState("");
-  const [operationIdValue, setOperationIdValue] = useState("");
+  const [selectedValidator, setSelectedValidator] = useState(data.value.handler || '');
+  const [expectedDataValue, setExpectedDataValue] = useState(data.value.actualData || '');
+  const [actualDataValue, setActualDataValue] = useState(data.value.expectedData || '');
+  const [operationIdValue, setOperationIdValue] = useState(data.value.operationId  || '');
 
   const handleValidatorChange = (event) => {
     setSelectedValidator(event.target.value);

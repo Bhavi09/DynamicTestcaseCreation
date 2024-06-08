@@ -7,9 +7,9 @@ import TextField from "@mui/material/TextField";
 import { Box } from "@mui/material";
 
 function LoopNode({ data, isConnectable }) {
-  const [indexValue, setIndexValue] = useState("");
-  const [startValue, setStartValue] = useState("");
-  const [endValue, setEndValue] = useState("");
+  const [indexValue, setIndexValue] = useState(data.value.index || '');
+  const [startValue, setStartValue] = useState(data.value.start || '');
+  const [endValue, setEndValue] = useState(data.value.end || '');
 
   const handleIndexValueChange = (event) => {
     setIndexValue(event.target.value);

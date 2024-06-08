@@ -1,8 +1,7 @@
-package com.example.demo.models;
+package com.example.demo.generateXml.models;
 
-import com.example.demo.service.GenerationLogic;
+import com.example.demo.generateXml.service.GenerationLogic;
 
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

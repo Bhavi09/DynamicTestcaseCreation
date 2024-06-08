@@ -1,10 +1,9 @@
-package com.example.demo.service.impl;
+package com.example.demo.generateXml.service.impl;
 
-import com.example.demo.service.GenerationFactory;
-import com.example.demo.service.GenerationLogic;
-import com.example.demo.service.TestcaseCreationService;
+import com.example.demo.generateXml.service.GenerationLogic;
+import com.example.demo.generateXml.service.TestcaseCreationService;
+import com.example.demo.generateXml.service.GenerationFactory;
 import com.google.gson.*;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;

@@ -1,4 +1,4 @@
-package com.example.demo.service;
+package com.example.demo.generateXml.service;
 
 public interface GenerationLogic {
 

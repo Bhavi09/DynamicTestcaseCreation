@@ -1,7 +1,7 @@
-package com.example.demo.models;
+package com.example.demo.generateXml.models;
 
-import com.example.demo.service.GenerationFactory;
-import com.example.demo.service.GenerationLogic;
+import com.example.demo.generateXml.service.GenerationFactory;
+import com.example.demo.generateXml.service.GenerationLogic;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;

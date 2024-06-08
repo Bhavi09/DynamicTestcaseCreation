@@ -9,9 +9,9 @@ import { options } from '../constants/options';
 
 
 function DeleteNode({ data, isConnectable }) {
-  const [selectedOption, setSelectedOption] = useState("");
-  const [fhirResourceIdValue, setFhirResourceId] = useState("");
-  const [operationIdValue, setOperationIdValue] = useState("");
+  const [selectedOption, setSelectedOption] = useState(data.value.resourceType || '');
+  const [fhirResourceIdValue, setFhirResourceId] = useState(data.value.fhirResourceId || '');
+  const [operationIdValue, setOperationIdValue] = useState(data.value.operationId || '');
 
   const handleSelectChange = (event) => {
     setSelectedOption(event.target.value);

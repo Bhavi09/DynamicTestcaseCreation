@@ -12,8 +12,8 @@ function UpdateNode({ data, isConnectable }) {
 
   const valueIds = useSelector(state => state.valueIdReducer.valueIds);
 
-  const [selectedResource, setSelectedResource] = useState('');
-  const [selectedValueId, setSelectedValueId] = useState('');
+  const [selectedResource, setSelectedResource] = useState(data.value.resourceType || '');
+  const [selectedValueId, setSelectedValueId] = useState(data.value.valueId || '');
 
   const handleResourceChange = (event) => {;
     setSelectedResource(event.target.value);

@@ -1,31 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Handle, Position } from 'reactflow';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
-import { FormControl, InputLabel, MenuItem, Select,Box } from '@mui/material';
+import { FormControl, InputLabel, MenuItem, Select, Box } from '@mui/material';
 import { options } from '../constants/options';
 
 function SearchNode({ data, isConnectable }) {
-  const [selectedResource, setSelectedResource] = useState("");
-  const [parameterValue, setParameterValue] = useState("");
-  const [operationIdValue, setOperationIdValue] = useState("");
+  const [selectedResource, setSelectedResource] = useState(data.value.resourceType || '');
+  const [parameterValue, setParameterValue] = useState(data.value.parameters || '');
+  const [operationIdValue, setOperationIdValue] = useState(data.value.operationId || '');
+
+  useEffect(() => {
+    data.value['resourceType'] = selectedResource;
+    data.value['parameters'] = parameterValue;
+    data.value['operationId'] = operationIdValue;
+  }, [selectedResource, parameterValue, operationIdValue]);
 
   const handleResourceChange = (event) => {
     setSelectedResource(event.target.value);
-    data.value["resourceType"] = event.target.value;
-    console.log(data);
   };
 
   const handleOperationIdDataChange = (event) => {
     setOperationIdValue(event.target.value);
-    data.value["operationId"] = event.target.value;
   }
 
   const handleParameterValueChange = (event) => {
     setParameterValue(event.target.value);
-    data.value['parameters'] = event.target.value;
   };
 
   const MenuProps = {
@@ -72,12 +74,12 @@ function SearchNode({ data, isConnectable }) {
         </Select>
       </FormControl>
       <TextField
-          id="textfilled-basic"
-          label="Parameter"
-          value={parameterValue}
-          onChange={handleParameterValueChange}
-          fullWidth
-        />
+        id="textfilled-basic"
+        label="Parameter"
+        value={parameterValue}
+        onChange={handleParameterValueChange}
+        fullWidth
+      />
       <TextField
         fullWidth
         id="standard-required"

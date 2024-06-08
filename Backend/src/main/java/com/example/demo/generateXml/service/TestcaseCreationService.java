@@ -1,4 +1,4 @@
-package com.example.demo.service;
+package com.example.demo.generateXml.service;
 
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
