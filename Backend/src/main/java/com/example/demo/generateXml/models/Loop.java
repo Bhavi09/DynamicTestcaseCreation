@@ -69,7 +69,7 @@ public class Loop implements GenerationLogic {
 
         String nodes = objectMapper.writeValueAsString(getNodeJson());
 
-        JsonArray loopNodesArray =  JsonParser.parseString(nodes==null?"[]":nodes).getAsJsonArray();
+            JsonArray loopNodesArray =  JsonParser.parseString(nodes==null?"[]":nodes).getAsJsonArray();
 
         GenerationFactory generationFactory = new GenerationFactory();
 

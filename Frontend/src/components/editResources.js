@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { deleteBodyValue,updateBodyValue } from "../store/reducers";
 import React, { useState } from "react";
 import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
 import TextField from "@mui/material/TextField";
 import ListItemText from "@mui/material/ListItemText";
 import List from "@mui/material/List";
@@ -15,6 +14,7 @@ import Typography from "@mui/material/Typography";
 import Slide from "@mui/material/Slide";
 import CloseIcon from "@mui/icons-material/Close";
 import Paper from "@mui/material/Paper";
+import {Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 
 import { EditTwoTone, DeleteTwoTone, SaveTwoTone } from "@ant-design/icons";
 
@@ -43,20 +43,19 @@ export default function EditResources({editResourceDialogOpen,setEditResourceDia
       );
 
     const [editResourceId, setEditResourceId] = useState(null);
+    const [deleteResourceId, setDeleteResourceId] = useState(null);
     const [editedResourceValue, setEditedResourceValue] = useState({});
-    const [editedResourceValueError, setEditedResourceValueError] =
-      useState(false);
-
-
-    
+    const [editedResourceValueError, setEditedResourceValueError] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     const handleEditResource = (resourceId) => {
         setEditResourceId(resourceId);
         setEditedResourceValue(bodyValuesFromStore[resourceId]["resource"]);
       };
 
-      const handleDeleteResource = (resourceId) => {
-        dispatch(deleteBodyValue(resourceId));
+      const handleDeleteResource = () => {
+        setIsDeleteModalOpen(false);
+        dispatch(deleteBodyValue(deleteResourceId));
       };
 
       const handleSaveResource = () => {
@@ -76,7 +75,13 @@ export default function EditResources({editResourceDialogOpen,setEditResourceDia
       };
 
       const handleEditResourceDialogClose = () => setEditResourceDialogOpen(false);
-
+      
+      const handleDeleteClick = (resourceId) => {
+        console.log(resourceId);
+        setDeleteResourceId(resourceId);
+        setIsDeleteModalOpen(true);
+      };    
+    
 
     return(
 <Dialog
@@ -135,7 +140,7 @@ export default function EditResources({editResourceDialogOpen,setEditResourceDia
                 <Button
                   variant="outlined"
                   style={{ margin: "10px" }}
-                  onClick={() => handleDeleteResource(resourceId)}
+                  onClick={()=>handleDeleteClick(resourceId)}
                 >
                   <DeleteTwoTone />
                 </Button>
@@ -178,6 +183,25 @@ export default function EditResources({editResourceDialogOpen,setEditResourceDia
             </div>
           ))}
         </List>
+        <Dialog
+        open={isDeleteModalOpen}
+        onClose={handleDeleteClick}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Delete Node"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this resource
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={()=> setIsDeleteModalOpen(false)}>Cancel</Button>
+          <Button onClick={handleDeleteResource} autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
       </Dialog>
     );
 }

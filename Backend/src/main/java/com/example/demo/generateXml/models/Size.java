@@ -5,12 +5,10 @@ import com.example.demo.generateXml.service.GenerationLogic;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Search implements GenerationLogic {
+public class Size implements GenerationLogic {
     String nodeType;
-    String resourceType;
-    String parameters;
+    String pathVariable;
     String operationId;
-
 
     public String getNodeType() {
         return nodeType;
@@ -20,20 +18,12 @@ public class Search implements GenerationLogic {
         this.nodeType = nodeType;
     }
 
-    public String getParameters() {
-        return parameters;
+    public String getPathVariable() {
+        return pathVariable;
     }
 
-    public void setParameters(String parameters) {
-        this.parameters = parameters;
-    }
-
-    public String getResourceType() {
-        return resourceType;
-    }
-
-    public void setResourceType(String resourceType) {
-        this.resourceType = resourceType;
+    public void setPathVariable(String pathVariable) {
+        this.pathVariable = pathVariable;
     }
 
     public String getOperationId() {
@@ -45,16 +35,11 @@ public class Search implements GenerationLogic {
     }
 
     @Override
-    public String generate()
-    {
-        String xml = "\n<send id=\""+getOperationId()+"\" desc=\"Search for "+getResourceType()+" from FHIR server\" from=\"ITB\" to=\"FhirHandler\" handler=\"$DOMAIN{fhirContextServiceAddress}\">\n" +
-                "<input name=\"fhirServerBaseUrl\">$componentURI</input>\n" +
-                "<input name=\"username\">$username</input>\n" +
-                "<input name=\"password\">$password</input>\n" +
-                "<input name=\"operationType\">\"search\"</input>\n" +
-                "<input name=\"fhirResourceType\">\""+getResourceType()+"\"</input>\n" +
-                "<input name=\"parameters\">"+addQuotesToExpression(getParameters())+"</input>\n" +
-                "</send>\n";
+    public String generate() throws Exception {
+        String xml = "<process id=\""+getOperationId()+"\" handler=\"CollectionUtils\">\n" +
+                "            <operation>size</operation>\n" +
+                "            <input name=\"map\">"+getPathVariable()+"</input>\n" +
+                "</process>\n";
         return xml;
     }
 
@@ -86,5 +71,4 @@ public class Search implements GenerationLogic {
 
         return result.toString();
     }
-
 }

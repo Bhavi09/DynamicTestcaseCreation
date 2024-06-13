@@ -36,6 +36,9 @@ public class GenerationFactory {
                 case "Create" -> {
                     yield objectmapper.readValue(jsonString, Create.class);
                 }
+                case "Update" -> {
+                    yield objectmapper.readValue(jsonString, Update.class);
+                }
                 case "Verify" -> {
                    yield objectmapper.readValue(jsonString, Verify.class);
                 }
@@ -68,6 +71,15 @@ public class GenerationFactory {
                 }
                 case "Loop" -> {
                     yield objectmapper.readValue(jsonString, Loop.class);
+                }
+                case "Condition"-> {
+                    yield objectmapper.readValue(jsonString, Condition.class);
+                }
+                case "Size"->{
+                    yield objectmapper.readValue(jsonString, Size.class);
+                }
+                case "Log" -> {
+                    yield objectmapper.readValue(jsonString, Log.class);
                 }
                 default -> {
                     yield null;

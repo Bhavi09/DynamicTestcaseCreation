@@ -31,6 +31,9 @@ import TranslateNode from "./nodes/translateNode";
 import ValidateCodeNode from "./nodes/validateCodeNode";
 import UpdateNode from "./nodes/updateNode";
 import LoopNode from "./nodes/loopNode";
+import ConditionNode from "./nodes/conditionNode";
+import SizeNode from "./nodes/size";
+import LogNode from "./nodes/logNode";
 
 import AddResources from "./components/AddResources.js";
 import EditResources from "./components/editResources.js";
@@ -60,7 +63,10 @@ const nodeTypes = {
   TranslateNode: TranslateNode,
   ValidateCodeNode: ValidateCodeNode,
   UpdateNode: UpdateNode,
-  LoopNode: LoopNode
+  LoopNode: LoopNode,
+  ConditionNode: ConditionNode,
+  SizeNode: SizeNode,
+  LogNode: LogNode
 };
 
 export default function App() {
@@ -239,6 +245,65 @@ const handleNodeSelect = (event, newValue) => {
 
   let listOfValueIds = useSelector((state) => state.valueIdReducer.valueIds);
 
+  const buildConditionJson = (nodeId, visited) => {
+    visited.add(nodeId);
+  
+    let topConnectedEdge = edges.find((edge) => edge.source === nodeId && edge.sourceHandle === 'right-top');
+    let bottomConnectedEdge = edges.find((edge) => edge.source === nodeId && edge.sourceHandle === 'right-bottom');
+    const thenNodeJson = [];
+    const elseNodeJson = [];
+
+    while(topConnectedEdge)
+    {
+      const targetId = topConnectedEdge.target;
+        if (!visited.has(targetId)) {
+        const node = nodes.find((n) => n.id === targetId);
+        const nodeData = {
+          nodeType: node.data.label,
+          ...node.data.value,
+        };
+        const childNodeJson = selectJsonBuilder(targetId, visited);
+        if (childNodeJson.length > 0) {
+          nodeData.nodeJson = childNodeJson;
+        }
+        thenNodeJson.push(nodeData);
+        topConnectedEdge = edges.find((edge) => edge.source === node.id && !visited.has(edge.target));
+
+    }
+  }
+  while(bottomConnectedEdge)
+    {
+      const targetId = bottomConnectedEdge.target;
+        if (!visited.has(targetId)) {
+        const node = nodes.find((n) => n.id === targetId);
+        const nodeData = {
+          nodeType: node.data.label,
+          ...node.data.value,
+        };
+        const childNodeJson = selectJsonBuilder(targetId, visited);
+        if (childNodeJson.length > 0) {
+          nodeData.nodeJson = childNodeJson;
+        }
+        elseNodeJson.push(nodeData);
+        bottomConnectedEdge = edges.find((edge) => edge.source === node.id && !visited.has(edge.target));
+
+    }
+  }
+  console.log(thenNodeJson)
+  console.log(elseNodeJson)
+    return [{
+      "thenNodeJson":thenNodeJson,
+      "elseNodeJson":elseNodeJson
+    }];
+  };
+  const selectJsonBuilder = (nodeId, visited) => {
+    if(nodes.find(n => n.id === nodeId).data.value.nodeType === 'Condition'){
+      return buildConditionJson(nodeId, visited);
+    } else {
+      return buildNodeJson(nodeId, visited);
+    }
+  }
+
   const buildNodeJson = (nodeId, visited) => {
     visited.add(nodeId);
   
@@ -254,9 +319,14 @@ const handleNodeSelect = (event, newValue) => {
           nodeType: node.data.label,
           ...node.data.value,
         };
-        const childNodeJson = buildNodeJson(targetId, visited);
-        if (childNodeJson.length > 0) {
-          nodeData.nodeJson = childNodeJson;
+        const childNodeJson = selectJsonBuilder(targetId, visited);
+        if (childNodeJson.length > 0 || childNodeJson[0]!=undefined) {
+          if(node.data.value.nodeType === 'Condition'){
+            nodeData.thenNodeJson = childNodeJson[0].thenNodeJson;
+            nodeData.elseNodeJson = childNodeJson[0].elseNodeJson;
+          } else {
+            nodeData.nodeJson = childNodeJson;
+          }
         }
         nodeJson.push(nodeData);
         connectedEdge = edges.find((edge) => edge.source === node.id && !visited.has(edge.target));
@@ -297,6 +367,15 @@ const handleNodeSelect = (event, newValue) => {
           };
           delete loopNode.id;
           jsonBody.push(loopNode);
+        } else if(node.nodeType === 'Condition') {
+          const conditionNodeJson = buildConditionJson(node.id, visited)[0];
+          const conditionNode = {
+            ...node,
+            thenNodeJson: conditionNodeJson.thenNodeJson,
+            elseNodeJson: conditionNodeJson.elseNodeJson
+          }
+          delete conditionNode.id;
+          jsonBody.push(conditionNode);
         } else {
           delete node.id;
           jsonBody.push(node);
@@ -304,11 +383,8 @@ const handleNodeSelect = (event, newValue) => {
         visited.add(node.id);
       }
     });
-    console.log("Nodes....");
-    console.log(nodes);
-    console.log("Edges...");
-    console.log(edges);
-    // console.log(jsonBody);
+
+    console.log(jsonBody);
     postData(jsonBody);
   };
   
@@ -366,7 +442,7 @@ const handleNodeSelect = (event, newValue) => {
         targetHandle: edge.targetHandle,
       })),
     };
-    console.log(flow);
+    // console.log(flow);
     saveFlow(flow);
   }
 

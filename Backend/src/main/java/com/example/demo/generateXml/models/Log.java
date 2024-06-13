@@ -5,12 +5,10 @@ import com.example.demo.generateXml.service.GenerationLogic;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Search implements GenerationLogic {
-    String nodeType;
-    String resourceType;
-    String parameters;
-    String operationId;
+public class Log implements GenerationLogic {
 
+    String nodeType;
+    String log;
 
     public String getNodeType() {
         return nodeType;
@@ -20,44 +18,19 @@ public class Search implements GenerationLogic {
         this.nodeType = nodeType;
     }
 
-    public String getParameters() {
-        return parameters;
+    public String getLog() {
+        return log;
     }
 
-    public void setParameters(String parameters) {
-        this.parameters = parameters;
-    }
-
-    public String getResourceType() {
-        return resourceType;
-    }
-
-    public void setResourceType(String resourceType) {
-        this.resourceType = resourceType;
-    }
-
-    public String getOperationId() {
-        return operationId;
-    }
-
-    public void setOperationId(String operationId) {
-        this.operationId = operationId;
+    public void setLog(String log) {
+        this.log = log;
     }
 
     @Override
-    public String generate()
-    {
-        String xml = "\n<send id=\""+getOperationId()+"\" desc=\"Search for "+getResourceType()+" from FHIR server\" from=\"ITB\" to=\"FhirHandler\" handler=\"$DOMAIN{fhirContextServiceAddress}\">\n" +
-                "<input name=\"fhirServerBaseUrl\">$componentURI</input>\n" +
-                "<input name=\"username\">$username</input>\n" +
-                "<input name=\"password\">$password</input>\n" +
-                "<input name=\"operationType\">\"search\"</input>\n" +
-                "<input name=\"fhirResourceType\">\""+getResourceType()+"\"</input>\n" +
-                "<input name=\"parameters\">"+addQuotesToExpression(getParameters())+"</input>\n" +
-                "</send>\n";
+    public String generate() throws Exception {
+        String xml="<log>"+getLog()+"</log>\n";
         return xml;
     }
-
     private String addQuotesToExpression(String expression) {
         // Regular expression to match static parts and leave dynamic parts intact
         String regex = "(\\w+[=:][^\\|\\|]*)|([\\|\\|\\s]+)|(\\$[^\\s\\|\\|]+\\{[^}]+\\})";
@@ -86,5 +59,4 @@ public class Search implements GenerationLogic {
 
         return result.toString();
     }
-
 }

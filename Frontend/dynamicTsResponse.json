@@ -138,6 +138,43 @@
     ]
   },
   {
+    "nodeType": "Condition",
+    "condition": "a<b",
+    "description": "check if a is less than b",
+    "nodeJson":{
+      "ifNodeJson":[
+        {
+          "nodeType": "Create",
+          "resourceType": "Patient",
+          "valueId": "Patient1",
+          "operationId": "Patient1ToCreate"
+        },
+        {
+          "nodeType": "Delete",
+          "resourceType": "Patient",
+          "fhirResourceId": "Patien1",
+          "operationId": "deletedPatient"
+        }
+      ],
+      "elseNodeJson": [
+        {
+          "nodeType": "Verify",
+          "handler": "StringValidator",
+          "actualData": "$createdPatient1{response}{body}{name}",
+          "expectedData": "Jane Doe",
+          "operationId": "verifyPatient"
+        },
+        {
+          "nodeType": "Lookup",
+          "resourceType" : "CodeSystem",
+          "system" : "",
+          "code" : "chol-mmol",
+          "operationId" : "lookup"
+        }
+      ]
+    }
+  },
+  {
     "nodeType": "Output",
     "successMessage": "Test case completed successfully.",
     "failureMessage": "Test case failed. Please check the failed step's report for more information and the test log."
